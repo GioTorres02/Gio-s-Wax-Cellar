@@ -1,7 +1,8 @@
 # productos/serializers.py
-"""Serializers de la app productos — W10.
+"""Serializers de la app productos — W10 y W11.
 
 Expone Categoria y Producto como recursos JSON para la API REST.
+Producto incluye la URL absoluta de la imagen (imagen_url) para clientes externos.
 """
 from rest_framework import serializers
 
@@ -18,11 +19,12 @@ class CategoriaSerializer(serializers.ModelSerializer):
 
 
 class ProductoSerializer(serializers.ModelSerializer):
-    """Serializer de Producto con nombre de categoría y proveedor.
+    """Serializer de Producto con nombre de categoría, proveedor e imagen.
 
     Campos adicionales:
         categoria_nombre: nombre legible de la FK categoria.
         proveedor_nombre: nombre legible de la FK proveedor (nullable).
+        imagen_url: URL absoluta de la imagen, o None si no tiene imagen.
     """
 
     categoria_nombre = serializers.CharField(
@@ -34,6 +36,7 @@ class ProductoSerializer(serializers.ModelSerializer):
         read_only=True,
         allow_null=True
     )
+    imagen_url = serializers.SerializerMethodField()
 
     class Meta:
         model  = Producto
@@ -41,6 +44,15 @@ class ProductoSerializer(serializers.ModelSerializer):
             'id', 'nombre', 'precio', 'stock',
             'categoria', 'categoria_nombre',
             'proveedor', 'proveedor_nombre',
-            'activo', 'creado',
+            'activo', 'imagen', 'imagen_url', 'creado',
         ]
-        read_only_fields = ['id', 'creado', 'categoria_nombre', 'proveedor_nombre']
+        read_only_fields = [
+            'id', 'creado', 'categoria_nombre',
+            'proveedor_nombre', 'imagen_url',
+        ]
+
+    def get_imagen_url(self, obj):
+        request = self.context.get('request')
+        if obj.imagen and request:
+            return request.build_absolute_uri(obj.imagen.url)
+        return None

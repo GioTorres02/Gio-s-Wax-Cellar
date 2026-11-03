@@ -20,7 +20,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 from proveedores.models import Proveedor
-
+from .validators import validar_imagen_producto
 
 class Categoria(models.Model):
     """Categoría para clasificar productos del catálogo.
@@ -85,6 +85,15 @@ class Producto(models.Model):
     )
     activo    = models.BooleanField(
         default=True, verbose_name='Activo'
+    )
+    # Actualizar el campo imagen en la clase Producto:
+    imagen = models.ImageField(
+        upload_to='productos/',
+        null=True,
+        blank=True,
+        verbose_name='Imagen del producto',
+        help_text='Formatos: JPEG, PNG, WEBP. Máximo 5 MB.',
+        validators=[validar_imagen_producto],   # ← agregar
     )
     creado    = models.DateTimeField(
         auto_now_add=True, verbose_name='Fecha de registro'
