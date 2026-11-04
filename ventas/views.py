@@ -1,108 +1,91 @@
-# ventas/views.py
-"""Vistas de la app ventas: W07, W08 y W09.
+import mimetypes
+import os
+from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
+from urllib.parse import urlparse, unquote
 
-W07: Lista y detalle.
-W08: crear_venta y borrado.
-W09: Permisos con decoradores y PermissionRequiredMixin.
-"""
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.views import redirect_to_login
-from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.views.generic import DeleteView, DetailView, ListView
+from django.conf import settings
+from django.contrib.staticfiles import finders
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 
-from .forms import DetalleVentaForm, VentaForm
-from .models import Venta
+from weasyprint import HTML, default_url_fetcher
+
+from .models import Venta, ConfiguracionEmpresa
 
 
-class VentaListView(ListView):
-    """Lista paginada de ventas en orden cronológico inverso."""
-
-    model               = Venta
-    template_name       = 'ventas/lista.html'
-    context_object_name = 'ventas'
-    paginate_by         = 20
-
-    def get_queryset(self):
-        """Pre-carga cliente para evitar N+1 en la tabla de ventas."""
-        return (
-            Venta.objects
-            .select_related('cliente')
-            .order_by('-fecha')
-        )
-
-
-class VentaDetailView(DetailView):
-    """Detalle de una venta."""
-
-    model               = Venta
-    template_name       = 'ventas/detalle.html'
-    context_object_name = 'venta'
-    pk_url_kwarg        = 'venta_id'
-
-    def get_queryset(self):
-        return Venta.objects.select_related('cliente')
-
-
-@login_required
-@permission_required('ventas.add_venta', raise_exception=True)
-def crear_venta(request):
-    """Crea un encabezado de venta con una línea de detalle.
-
-    GET  → muestra los dos formularios vacíos.
-    POST → valida ambos, guarda si correctos, muestra errores si no.
-    Nota: para múltiples líneas usar formsets (implementar en Espiral 5).
+def _ruta_segura(base, relativa):
     """
-    venta_form   = VentaForm(request.POST or None)
-    detalle_form = DetalleVentaForm(request.POST or None)
-
-    if request.method == 'POST':
-        if venta_form.is_valid() and detalle_form.is_valid():
-            venta         = venta_form.save()
-            detalle       = detalle_form.save(commit=False)
-            detalle.venta = venta
-            # precio_unitario se auto-captura en save() si es None
-            detalle.save()
-            messages.success(
-                request,
-                f'Venta #{venta.pk} registrada. '
-                f'Total: ${venta.total:.2f}'
-            )
-            return redirect('ventas:detalle', venta_id=venta.pk)
-
-    return render(request, 'ventas/crear.html', {
-        'venta_form':   venta_form,
-        'detalle_form': detalle_form,
-    })
-
-
-class VentaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    """Confirmación y borrado de una venta (y sus detalles en cascada).
-
-    Anónimo → login (302). Autenticado sin permiso → 403.
+    Devuelve la ruta absoluta solo si queda dentro de `base`.
+    Evita que rutas con '..' lean archivos fuera de MEDIA_ROOT.
     """
+    base = os.path.abspath(base)
+    ruta = os.path.abspath(os.path.join(base, relativa))
+    if os.path.commonpath([base, ruta]) != base:
+        return None
+    return ruta
 
-    model               = Venta
-    template_name       = 'ventas/eliminar.html'
-    pk_url_kwarg        = 'venta_id'
-    success_url         = reverse_lazy('ventas:lista')
-    permission_required = 'ventas.delete_venta'
-    raise_exception     = True
 
-    def handle_no_permission(self):
-        """Anónimo → login (302). Autenticado sin permiso → 403."""
-        if not self.request.user.is_authenticated:
-            return redirect_to_login(
-                self.request.get_full_path(),
-                self.get_login_url(),
-                self.get_redirect_field_name(),
-            )
-        return super().handle_no_permission()
+def url_fetcher_local(url, *args, **kwargs):
+    """
+    WeasyPrint llama a esta función para cada recurso (imágenes, CSS, fuentes).
+    Si la URL apunta a /media/ o /static/, lee el archivo directamente del disco
+    en lugar de hacer una petición HTTP al propio servidor.
+    """
+    path = unquote(urlparse(url).path)
 
-    def form_valid(self, form):
-        pk       = self.object.pk
-        response = super().form_valid(form)
-        messages.success(self.request, f'Venta #{pk} eliminada.')
-        return response
+    if path.startswith(settings.MEDIA_URL):
+        local = _ruta_segura(settings.MEDIA_ROOT, path[len(settings.MEDIA_URL):])
+    elif path.startswith(settings.STATIC_URL):
+        local = finders.find(path[len(settings.STATIC_URL):])
+    else:
+        # URLs externas: se delegan al fetcher por defecto
+        return default_url_fetcher(url, *args, **kwargs)
+
+    if not local or not os.path.isfile(local):
+        # Recurso inválido o inexistente: se devuelve vacío para que
+        # WeasyPrint omita la imagen sin tumbar la generación del PDF
+        return {"string": b"", "mime_type": "application/octet-stream"}
+
+    mime, _ = mimetypes.guess_type(local)
+    with open(local, "rb") as f:
+        return {"string": f.read(), "mime_type": mime or "application/octet-stream"}
+
+
+def venta_pdf(request, pk):
+    venta = get_object_or_404(Venta, pk=pk)
+
+    config = ConfiguracionEmpresa.objects.first()
+    if config is None:
+        raise Http404("Falta la configuración de la empresa.")
+
+    detalles = venta.detalles.all()
+    subtotal = sum((d.subtotal for d in detalles), Decimal("0"))
+    subtotal = subtotal.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    iva = (subtotal * Decimal(str(config.iva_porcentaje)) / 100).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    total_con_iva = subtotal + iva
+
+    contexto = {
+        "venta": venta,
+        "config": config,
+        "subtotal": subtotal,
+        "iva": iva,
+        "total_con_iva": total_con_iva,
+        "hoy": date.today(),
+    }
+
+    html_string = render_to_string("ventas/factura_pdf.html", contexto, request=request)
+
+    pdf = HTML(
+        string=html_string,
+        base_url=request.build_absolute_uri("/"),  # ej. http://localhost:8000/
+        url_fetcher=url_fetcher_local,
+    ).write_pdf()
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="factura_{venta.pk}.pdf"'
+    return response

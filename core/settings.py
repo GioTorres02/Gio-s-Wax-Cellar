@@ -8,12 +8,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(DEBUG=(bool, True))
 environ.Env.read_env(BASE_DIR / '.env')
 
-SECRET_KEY    = env('SECRET_KEY', default='dev-key-insegura-solo-para-desarrollo')
-DEBUG         = env.bool('DEBUG', default=True)
+SECRET_KEY = env('SECRET_KEY', default='dev-key-insegura-solo-para-desarrollo')
+DEBUG = env.bool('DEBUG', default=True)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
+# Render asigna su propio hostname en esta variable. Si existe, lo agregamos
+# a ALLOWED_HOSTS y a CSRF_TRUSTED_ORIGINS para que el sitio responda y los
+# formularios no fallen con error 403.
+RENDER_EXTERNAL_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME', default='')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS = [f'https://{RENDER_EXTERNAL_HOSTNAME}']
+
 # ── Apps instaladas ───────────────────────────────────────────────────────
-# core/settings.py — actualizar INSTALLED_APPS (terceros):
+# jazzmin debe ir ANTES de django.contrib.admin
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -28,7 +36,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_framework',
-    'rest_framework.authtoken',    # ← agregar
+    'rest_framework.authtoken',
     'whitenoise.runserver_nostatic',
     # Apps del ERP
     'clientes',
@@ -40,8 +48,6 @@ INSTALLED_APPS = [
     'core',
 ]
 
-
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -51,9 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',   # ← agregar al final
+    'allauth.account.middleware.AccountMiddleware',
 ]
-
 
 ROOT_URLCONF = 'core.urls'
 
@@ -61,7 +66,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],       # carpeta global de templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,40 +89,40 @@ DATABASES = {
 
 # ── Internacionalización ──────────────────────────────────────────────────
 LANGUAGE_CODE = 'es-mx'
-TIME_ZONE     = 'America/Mexico_City'
-USE_I18N      = True
-USE_TZ        = True
+TIME_ZONE = 'America/Mexico_City'
+USE_I18N = True
+USE_TZ = True
 
 # ── Archivos estáticos ────────────────────────────────────────────────────
-STATIC_URL       = '/static/'
-STATIC_ROOT      = BASE_DIR / 'staticfiles'
-# STATICFILES_DIRS ≠ STATIC_ROOT (error frecuente)
-STATICFILES_DIRS = [BASE_DIR / 'static']  # fuentes adicionales
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'           # destino de collectstatic
+STATICFILES_DIRS = [BASE_DIR / 'static']         # fuentes adicionales
 
 STORAGES = {
     'default': {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
+        # Con DEBUG=False, ejecuta `collectstatic` antes de arrancar el servidor
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
 
 # ── Archivos media ────────────────────────────────────────────────────────
-MEDIA_URL  = '/media/'
+# WeasyPrint lee estos archivos desde disco mediante url_fetcher_local
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ── Autenticación ─────────────────────────────────────────────────────────
-LOGIN_URL           = '/accounts/login/'
-LOGIN_REDIRECT_URL  = '/productos/'
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/productos/'
 LOGOUT_REDIRECT_URL = '/'
 
 # ── DRF ──────────────────────────────────────────────────────────────────
-# core/settings.py — reemplazar la configuración REST_FRAMEWORK de W01:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',   # para el navegador
-        'rest_framework.authentication.TokenAuthentication',     # para clientes externos
+        'rest_framework.authentication.SessionAuthentication',   # navegador
+        'rest_framework.authentication.TokenAuthentication',     # clientes externos
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -126,124 +131,118 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ── JAZZMIN — Personalización del admin con Fable 5 AzulERP ───────────────
+# ── JAZZMIN — Personalización del admin ───────────────────────────────────
 JAZZMIN_SETTINGS = {
     # Identidad
-    'site_title':       'ERP Django',
-    'site_header':      'ERP UTEC Celaya',
-    'site_brand':       '📦 ERP Django',
-    'welcome_sign':     'Bienvenido al Sistema ERP · UTEC Celaya',
-    'copyright':        'Gio Torres · UTEC Celaya',
+    'site_title': 'ERP Django',
+    'site_header': 'ERP UTEC Celaya',
+    'site_brand': '📦 ERP Django',
+    'welcome_sign': 'Bienvenido al Sistema ERP · UTEC Celaya',
+    'copyright': 'Gio Torres · UTEC Celaya',
 
-    # Icono del sitio (usar emoji como fallback)
-    'site_icon':        None,
-    'site_logo':        None,    # ruta a logo en static/ (agregar en W11+)
+    # Logo (ruta relativa a static/, agregar en W11+)
+    'site_icon': None,
+    'site_logo': None,
 
     # Búsqueda global en el admin
-    'search_model':     ['clientes.Cliente', 'productos.Producto'],
+    'search_model': ['clientes.Cliente', 'productos.Producto'],
 
-    # Menú superior (top navigation)
+    # Menú superior
     'topmenu_links': [
-        {'name': 'Inicio ERP',   'url': '/', 'new_window': False},
-        {'name': 'Productos',    'url': '/productos/'},
-        {'name': 'Clientes',     'url': '/clientes/'},
-        {'name': 'Ventas',       'url': '/ventas/'},
+        {'name': 'Inicio ERP', 'url': '/', 'new_window': False},
+        {'name': 'Productos', 'url': '/productos/'},
+        {'name': 'Clientes', 'url': '/clientes/'},
+        {'name': 'Ventas', 'url': '/ventas/'},
     ],
 
-    # Menú de usuario (avatar)
+    # Menú de usuario
     'usermenu_links': [
         {'name': 'Ver ERP', 'url': '/', 'new_window': False},
     ],
 
-    # Menú lateral: orden de apps y modelos
+    # Orden del menú lateral
     'order_with_respect_to': [
         'clientes', 'proveedores', 'productos',
         'ventas', 'configuracion', 'auth',
     ],
 
-    # Iconos de Font Awesome para cada modelo
+    # Iconos de Font Awesome
     'icons': {
-        'auth':                           'fas fa-users-cog',
-        'auth.user':                      'fas fa-user',
-        'auth.Group':                     'fas fa-users',
-        'clientes.Cliente':               'fas fa-user-tie',
-        'proveedores.Proveedor':          'fas fa-truck',
-        'productos.Categoria':            'fas fa-tags',
-        'productos.Producto':             'fas fa-box',
-        'ventas.Venta':                   'fas fa-file-invoice-dollar',
-        'ventas.DetalleVenta':            'fas fa-list',
-        'ventas.Pedido':                  'fas fa-shopping-cart',
-        'configuracion.ConfiguracionERP': 'fas fa-cogs',
+        'auth': 'fas fa-users-cog',
+        'auth.user': 'fas fa-user',
+        'auth.Group': 'fas fa-users',
+        'clientes.Cliente': 'fas fa-user-tie',
+        'proveedores.Proveedor': 'fas fa-truck',
+        'productos.Categoria': 'fas fa-tags',
+        'productos.Producto': 'fas fa-box',
+        'ventas.Venta': 'fas fa-file-invoice-dollar',
+        'ventas.DetalleVenta': 'fas fa-list',
+        'ventas.Pedido': 'fas fa-shopping-cart',
+        # Debe coincidir con el nombre real del modelo (en views.py se usa ConfiguracionEmpresa)
+        'configuracion.ConfiguracionEmpresa': 'fas fa-cogs',
     },
-    'default_icon_parents':  'fas fa-folder',
+    'default_icon_parents': 'fas fa-folder',
     'default_icon_children': 'fas fa-circle',
 
     # Apariencia
-    'related_modal_active':  True,
-    'custom_css':            'erp_custom.css',   # archivo en static/
-    'show_sidebar':          True,
-    'navigation_expanded':   True,
-    'hide_apps':             [],
-    'hide_models':           [],
+    'related_modal_active': True,
+    'custom_css': 'erp_custom.css',   # archivo en static/
+    'show_sidebar': True,
+    'navigation_expanded': True,
+    'hide_apps': [],
+    'hide_models': [],
 
-    # UI tweaks
-    'changeform_format':     'horizontal_tabs',
-    'language_chooser':      False,
+    # UI
+    'changeform_format': 'horizontal_tabs',
+    'language_chooser': False,
 }
 
 JAZZMIN_UI_TWEAKS = {
-    'navbar_small_text':         False,
-    'footer_small_text':         False,
-    'body_small_text':           False,
-    'brand_small_text':          False,
-    'brand_colour':              'navbar-dark',
-    'accent':                    'accent-navy',
-    'navbar':                    'navbar-dark',
-    'no_navbar_border':          False,
-    'navbar_fixed':              True,
-    'layout_boxed':              False,
-    'footer_fixed':              False,
-    'sidebar_fixed':             True,
-    'sidebar':                   'sidebar-dark-navy',
-    'sidebar_nav_small_text':    False,
-    'sidebar_disable_expand':    False,
-    'sidebar_nav_child_indent':  True,
+    'navbar_small_text': False,
+    'footer_small_text': False,
+    'body_small_text': False,
+    'brand_small_text': False,
+    'brand_colour': 'navbar-dark',
+    'accent': 'accent-navy',
+    'navbar': 'navbar-dark',
+    'no_navbar_border': False,
+    'navbar_fixed': True,
+    'layout_boxed': False,
+    'footer_fixed': False,
+    'sidebar_fixed': True,
+    'sidebar': 'sidebar-dark-navy',
+    'sidebar_nav_small_text': False,
+    'sidebar_disable_expand': False,
+    'sidebar_nav_child_indent': True,
     'sidebar_nav_compact_style': False,
-    'sidebar_nav_legacy_style':  False,
-    'sidebar_nav_flat_style':    False,
-    'theme':                     'default',
-    'default_theme_mode':        'auto',   # 'auto', 'light' o 'dark'
+    'sidebar_nav_legacy_style': False,
+    'sidebar_nav_flat_style': False,
+    'theme': 'default',
+    'default_theme_mode': 'auto',   # 'auto', 'light' o 'dark'
     'button_classes': {
-        'primary':   'btn-primary',
+        'primary': 'btn-primary',
         'secondary': 'btn-secondary',
-        'info':      'btn-info',
-        'warning':   'btn-warning',
-        'danger':    'btn-danger',
-        'success':   'btn-success',
+        'info': 'btn-info',
+        'warning': 'btn-warning',
+        'danger': 'btn-danger',
+        'success': 'btn-success',
     },
 }
+
 # ── DJANGO SITES (requerido por allauth) ──────────────────────────────────
 SITE_ID = 1
 
 # ── AUTHENTICATION BACKENDS ───────────────────────────────────────────────
 AUTHENTICATION_BACKENDS = [
-    # Backend estándar de Django (username + password en admin)
     'django.contrib.auth.backends.ModelBackend',
-    # Backend de allauth (permite login por email también)
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # ── ALLAUTH: configuración para desarrollo académico ──────────────────────
-ACCOUNT_LOGIN_METHODS          = {'username'}   # login por username
-ACCOUNT_EMAIL_REQUIRED         = False          # no obligar correo
-ACCOUNT_EMAIL_VERIFICATION     = 'none'         # no enviar email de verificación
-ACCOUNT_LOGOUT_ON_GET          = True           # logout sin confirmar (dev)
-ACCOUNT_SESSION_REMEMBER       = True           # recordar sesión
-
-# LOGIN_URL y LOGIN_REDIRECT_URL ya definidos en W01:
-# LOGIN_URL           = '/accounts/login/'
-# LOGIN_REDIRECT_URL  = '/productos/'
-LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SESSION_REMEMBER = True
