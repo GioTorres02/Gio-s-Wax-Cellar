@@ -9,6 +9,7 @@ Factura: venta_pdf con WeasyPrint (import diferido).
 import mimetypes
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
+from types import SimpleNamespace
 from urllib.parse import unquote, urlparse
 
 from django.conf import settings
@@ -17,7 +18,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.staticfiles import finders
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.http.request import validate_host
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -191,16 +192,23 @@ def calcular_totales(subtotal, iva_porcentaje) -> dict:
 
 @login_required
 def venta_pdf(request, venta_id: int) -> HttpResponse:
-    """Genera la factura de una venta en PDF con WeasyPrint."""
+    """Genera la factura de una venta en PDF con WeasyPrint.
+
+    Si no existe ConfiguracionERP, usa valores por defecto en lugar de fallar.
+    """
     import weasyprint  # import diferido: solo se necesita al generar el PDF
 
     venta = get_object_or_404(
         Venta.objects.select_related("cliente").prefetch_related("detalles__producto"),
         pk=venta_id,
     )
-    config = ConfiguracionERP.objects.first()
-    if config is None:
-        raise Http404("Falta la configuración de la empresa.")
+    config = ConfiguracionERP.objects.first() or SimpleNamespace(
+        nombre_empresa="UTEC Celaya",
+        rfc="",
+        moneda="MXN",
+        iva_porcentaje=16,
+        logo=None,
+    )
 
     context = {
         "venta": venta,
