@@ -1,9 +1,10 @@
 # ventas/views.py
-"""Vistas de la app ventas: W07, W08 y W09.
+"""Vistas de la app ventas: W07, W08, W09 y factura PDF.
 
 W07: Lista y detalle.
 W08: crear_venta y borrado.
 W09: Permisos con decoradores y PermissionRequiredMixin.
+Factura: venta_pdf con WeasyPrint (import diferido).
 """
 import mimetypes
 from decimal import ROUND_HALF_UP, Decimal
@@ -11,18 +12,23 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.staticfiles import finders
 from django.http import Http404, HttpResponse
 from django.http.request import validate_host
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, ListView, DeleteView, CreateView, UpdateView
+from django.views.generic import DeleteView, DetailView, ListView
 
-import weasyprint
+from configuracion.models import ConfiguracionERP
+from .forms import DetalleVentaForm, VentaForm
+from .models import Venta
 
-from .models import ConfiguracionEmpresa, Venta
 
 class VentaListView(ListView):
     """Lista paginada de ventas en orden cronológico inverso."""
@@ -114,7 +120,8 @@ class VentaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         messages.success(self.request, f'Venta #{pk} eliminada.')
         return response
 
-    # ── Recursos locales para WeasyPrint ─────────────────────────────────────
+
+# ── Factura PDF ──────────────────────────────────────────────────────────
 
 def _ruta_local(url_path: str) -> Path | None:
     """Traduce /static/... o /media/... a un archivo en disco, o None."""
@@ -145,7 +152,10 @@ def _url_fetcher_local(url: str, timeout: int = 10, ssl_context=None):
     Evita peticiones HTTP al propio servidor, que pueden bloquearse con
     un solo worker de Gunicorn. Si un recurso propio no existe, lanza
     FileNotFoundError y WeasyPrint omite solo esa imagen.
+    Las URLs externas usan el fetcher por defecto.
     """
+    from weasyprint import default_url_fetcher  # import diferido
+
     parsed = urlparse(url)
 
     if parsed.scheme in ("http", "https", "file"):
@@ -164,31 +174,31 @@ def _url_fetcher_local(url: str, timeout: int = 10, ssl_context=None):
         if es_propio:
             raise FileNotFoundError(url)
 
-    return weasyprint.default_url_fetcher(url, timeout=timeout, ssl_context=ssl_context)
+    return default_url_fetcher(url, timeout=timeout, ssl_context=ssl_context)
 
-
-# ── Cálculos ─────────────────────────────────────────────────────────────
 
 def calcular_totales(subtotal, iva_porcentaje) -> dict:
-    """Devuelve subtotal, IVA y total con 2 decimales (redondeo comercial)."""
+    """Devuelve subtotal, IVA y total con 2 decimales (redondeo comercial).
+
+    Ejemplo: calcular_totales(Decimal("3000"), 16)
+             -> subtotal 3000.00, iva 480.00, total_con_iva 3480.00
+    """
     centavos = Decimal("0.01")
     subtotal = Decimal(subtotal or 0).quantize(centavos, ROUND_HALF_UP)
     iva = (subtotal * Decimal(str(iva_porcentaje)) / 100).quantize(centavos, ROUND_HALF_UP)
     return {"subtotal": subtotal, "iva": iva, "total_con_iva": subtotal + iva}
 
 
-# ── Vista de factura ─────────────────────────────────────────────────────
-
 @login_required
-def venta_pdf(request, pk):
+def venta_pdf(request, venta_id: int) -> HttpResponse:
     """Genera la factura de una venta en PDF con WeasyPrint."""
+    import weasyprint  # import diferido: solo se necesita al generar el PDF
+
     venta = get_object_or_404(
-        Venta.objects.select_related("cliente").prefetch_related(
-            "detalles__producto__categoria"
-        ),
-        pk=pk,
+        Venta.objects.select_related("cliente").prefetch_related("detalles__producto"),
+        pk=venta_id,
     )
-    config = ConfiguracionEmpresa.objects.first()
+    config = ConfiguracionERP.objects.first()
     if config is None:
         raise Http404("Falta la configuración de la empresa.")
 

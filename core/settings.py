@@ -180,8 +180,8 @@ JAZZMIN_SETTINGS = {
         'ventas.Venta': 'fas fa-file-invoice-dollar',
         'ventas.DetalleVenta': 'fas fa-list',
         'ventas.Pedido': 'fas fa-shopping-cart',
-        # Debe coincidir con el nombre real del modelo (en views.py se usa ConfiguracionEmpresa)
-        'configuracion.ConfiguracionEmpresa': 'fas fa-cogs',
+        # Debe coincidir con el nombre real de la clase en configuracion/models.py
+        'configuracion.ConfiguracionERP': 'fas fa-cogs',
     },
     'default_icon_parents': 'fas fa-folder',
     'default_icon_children': 'fas fa-circle',
