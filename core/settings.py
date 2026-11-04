@@ -136,7 +136,7 @@ JAZZMIN_SETTINGS = {
     'site_header':      'ERP UTEC Celaya',
     'site_brand':       '📦 ERP Django',
     'welcome_sign':     'Bienvenido al Sistema ERP · UTEC Celaya',
-    'copyright':        'MC. Román Fernando López González · UTEC Celaya',
+    'copyright':        'Gio Torres · UTEC Celaya',
 
     # Icono del sitio (usar emoji como fallback)
     'site_icon':        None,

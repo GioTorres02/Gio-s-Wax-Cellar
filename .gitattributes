@@ -1,0 +1,16 @@
+# Normaliza finales de línea en el repositorio.
+* text=auto
+# Scripts de shell y archivos que lee Linux: siempre LF (si no, falla en Docker/Render)
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+requirements.txt text eol=lf
+# Binarios
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.pdf  binary
+*.docx binary
+*.sqlite3 binary
