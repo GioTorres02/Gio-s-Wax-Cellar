@@ -1,91 +1,212 @@
+# ventas/views.py
+"""Vistas de la app ventas: W07, W08 y W09.
+
+W07: Lista y detalle.
+W08: crear_venta y borrado.
+W09: Permisos con decoradores y PermissionRequiredMixin.
+"""
 import mimetypes
-import os
-from datetime import date
-from decimal import Decimal, ROUND_HALF_UP
-from urllib.parse import urlparse, unquote
+from decimal import ROUND_HALF_UP, Decimal
+from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles import finders
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.http.request import validate_host
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
+from django.utils import timezone
+from django.views.generic import DetailView, ListView, DeleteView, CreateView, UpdateView
 
-from weasyprint import HTML, default_url_fetcher
+import weasyprint
 
-from .models import Venta, ConfiguracionEmpresa
+from .models import ConfiguracionEmpresa, Venta
+
+class VentaListView(ListView):
+    """Lista paginada de ventas en orden cronológico inverso."""
+
+    model               = Venta
+    template_name       = 'ventas/lista.html'
+    context_object_name = 'ventas'
+    paginate_by         = 20
+
+    def get_queryset(self):
+        """Pre-carga cliente para evitar N+1 en la tabla de ventas."""
+        return (
+            Venta.objects
+            .select_related('cliente')
+            .order_by('-fecha')
+        )
 
 
-def _ruta_segura(base, relativa):
+class VentaDetailView(DetailView):
+    """Detalle de una venta."""
+
+    model               = Venta
+    template_name       = 'ventas/detalle.html'
+    context_object_name = 'venta'
+    pk_url_kwarg        = 'venta_id'
+
+    def get_queryset(self):
+        return Venta.objects.select_related('cliente')
+
+
+@login_required
+@permission_required('ventas.add_venta', raise_exception=True)
+def crear_venta(request):
+    """Crea un encabezado de venta con una línea de detalle.
+
+    GET  → muestra los dos formularios vacíos.
+    POST → valida ambos, guarda si correctos, muestra errores si no.
+    Nota: para múltiples líneas usar formsets (implementar en Espiral 5).
     """
-    Devuelve la ruta absoluta solo si queda dentro de `base`.
-    Evita que rutas con '..' lean archivos fuera de MEDIA_ROOT.
+    venta_form   = VentaForm(request.POST or None)
+    detalle_form = DetalleVentaForm(request.POST or None)
+
+    if request.method == 'POST':
+        if venta_form.is_valid() and detalle_form.is_valid():
+            venta         = venta_form.save()
+            detalle       = detalle_form.save(commit=False)
+            detalle.venta = venta
+            # precio_unitario se auto-captura en save() si es None
+            detalle.save()
+            messages.success(
+                request,
+                f'Venta #{venta.pk} registrada. '
+                f'Total: ${venta.total:.2f}'
+            )
+            return redirect('ventas:detalle', venta_id=venta.pk)
+
+    return render(request, 'ventas/crear.html', {
+        'venta_form':   venta_form,
+        'detalle_form': detalle_form,
+    })
+
+
+class VentaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """Confirmación y borrado de una venta (y sus detalles en cascada).
+
+    Anónimo → login (302). Autenticado sin permiso → 403.
     """
-    base = os.path.abspath(base)
-    ruta = os.path.abspath(os.path.join(base, relativa))
-    if os.path.commonpath([base, ruta]) != base:
-        return None
-    return ruta
+
+    model               = Venta
+    template_name       = 'ventas/eliminar.html'
+    pk_url_kwarg        = 'venta_id'
+    success_url         = reverse_lazy('ventas:lista')
+    permission_required = 'ventas.delete_venta'
+    raise_exception     = True
+
+    def handle_no_permission(self):
+        """Anónimo → login (302). Autenticado sin permiso → 403."""
+        if not self.request.user.is_authenticated:
+            return redirect_to_login(
+                self.request.get_full_path(),
+                self.get_login_url(),
+                self.get_redirect_field_name(),
+            )
+        return super().handle_no_permission()
+
+    def form_valid(self, form):
+        pk       = self.object.pk
+        response = super().form_valid(form)
+        messages.success(self.request, f'Venta #{pk} eliminada.')
+        return response
+
+    # ── Recursos locales para WeasyPrint ─────────────────────────────────────
+
+def _ruta_local(url_path: str) -> Path | None:
+    """Traduce /static/... o /media/... a un archivo en disco, o None."""
+    static_prefix = "/" + settings.STATIC_URL.lstrip("/")
+    media_prefix = "/" + settings.MEDIA_URL.lstrip("/")
+
+    if url_path.startswith(static_prefix):
+        relativa = url_path[len(static_prefix):]
+        candidata = Path(settings.STATIC_ROOT) / relativa
+        if candidata.is_file():
+            return candidata
+        encontrada = finders.find(relativa)  # funciona sin collectstatic
+        return Path(encontrada) if encontrada else None
+
+    if url_path.startswith(media_prefix):
+        raiz = Path(settings.MEDIA_ROOT).resolve()
+        candidata = (raiz / url_path[len(media_prefix):]).resolve()
+        # Bloquea rutas con ../ que salgan de MEDIA_ROOT
+        if raiz in candidata.parents and candidata.is_file():
+            return candidata
+
+    return None
 
 
-def url_fetcher_local(url, *args, **kwargs):
+def _url_fetcher_local(url: str, timeout: int = 10, ssl_context=None):
+    """url_fetcher de WeasyPrint: lee /static/ y /media/ desde disco.
+
+    Evita peticiones HTTP al propio servidor, que pueden bloquearse con
+    un solo worker de Gunicorn. Si un recurso propio no existe, lanza
+    FileNotFoundError y WeasyPrint omite solo esa imagen.
     """
-    WeasyPrint llama a esta función para cada recurso (imágenes, CSS, fuentes).
-    Si la URL apunta a /media/ o /static/, lee el archivo directamente del disco
-    en lugar de hacer una petición HTTP al propio servidor.
-    """
-    path = unquote(urlparse(url).path)
+    parsed = urlparse(url)
 
-    if path.startswith(settings.MEDIA_URL):
-        local = _ruta_segura(settings.MEDIA_ROOT, path[len(settings.MEDIA_URL):])
-    elif path.startswith(settings.STATIC_URL):
-        local = finders.find(path[len(settings.STATIC_URL):])
-    else:
-        # URLs externas: se delegan al fetcher por defecto
-        return default_url_fetcher(url, *args, **kwargs)
+    if parsed.scheme in ("http", "https", "file"):
+        ruta = _ruta_local(unquote(parsed.path))
+        if ruta is not None:
+            return {
+                "string": ruta.read_bytes(),
+                "mime_type": mimetypes.guess_type(ruta.name)[0] or "application/octet-stream",
+                "filename": ruta.name,
+            }
 
-    if not local or not os.path.isfile(local):
-        # Recurso inválido o inexistente: se devuelve vacío para que
-        # WeasyPrint omita la imagen sin tumbar la generación del PDF
-        return {"string": b"", "mime_type": "application/octet-stream"}
+        es_propio = parsed.scheme == "file" or validate_host(
+            parsed.hostname or "",
+            ["localhost", "127.0.0.1", *settings.ALLOWED_HOSTS],
+        )
+        if es_propio:
+            raise FileNotFoundError(url)
 
-    mime, _ = mimetypes.guess_type(local)
-    with open(local, "rb") as f:
-        return {"string": f.read(), "mime_type": mime or "application/octet-stream"}
+    return weasyprint.default_url_fetcher(url, timeout=timeout, ssl_context=ssl_context)
 
 
+# ── Cálculos ─────────────────────────────────────────────────────────────
+
+def calcular_totales(subtotal, iva_porcentaje) -> dict:
+    """Devuelve subtotal, IVA y total con 2 decimales (redondeo comercial)."""
+    centavos = Decimal("0.01")
+    subtotal = Decimal(subtotal or 0).quantize(centavos, ROUND_HALF_UP)
+    iva = (subtotal * Decimal(str(iva_porcentaje)) / 100).quantize(centavos, ROUND_HALF_UP)
+    return {"subtotal": subtotal, "iva": iva, "total_con_iva": subtotal + iva}
+
+
+# ── Vista de factura ─────────────────────────────────────────────────────
+
+@login_required
 def venta_pdf(request, pk):
-    venta = get_object_or_404(Venta, pk=pk)
-
+    """Genera la factura de una venta en PDF con WeasyPrint."""
+    venta = get_object_or_404(
+        Venta.objects.select_related("cliente").prefetch_related(
+            "detalles__producto__categoria"
+        ),
+        pk=pk,
+    )
     config = ConfiguracionEmpresa.objects.first()
     if config is None:
         raise Http404("Falta la configuración de la empresa.")
 
-    detalles = venta.detalles.all()
-    subtotal = sum((d.subtotal for d in detalles), Decimal("0"))
-    subtotal = subtotal.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-    iva = (subtotal * Decimal(str(config.iva_porcentaje)) / 100).quantize(
-        Decimal("0.01"), rounding=ROUND_HALF_UP
-    )
-    total_con_iva = subtotal + iva
-
-    contexto = {
+    context = {
         "venta": venta,
         "config": config,
-        "subtotal": subtotal,
-        "iva": iva,
-        "total_con_iva": total_con_iva,
-        "hoy": date.today(),
+        "hoy": timezone.localdate(),
+        **calcular_totales(venta.total, config.iva_porcentaje),
     }
 
-    html_string = render_to_string("ventas/factura_pdf.html", contexto, request=request)
+    html_string = render_to_string("ventas/factura_pdf.html", context, request=request)
 
-    pdf = HTML(
+    pdf_bytes = weasyprint.HTML(
         string=html_string,
-        base_url=request.build_absolute_uri("/"),  # ej. http://localhost:8000/
-        url_fetcher=url_fetcher_local,
+        base_url=request.build_absolute_uri("/"),
+        url_fetcher=_url_fetcher_local,
     ).write_pdf()
 
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f'inline; filename="factura_{venta.pk}.pdf"'
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="factura_{venta.pk:05d}.pdf"'
     return response
