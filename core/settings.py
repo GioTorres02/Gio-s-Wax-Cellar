@@ -12,13 +12,26 @@ SECRET_KEY = env('SECRET_KEY', default='dev-key-insegura-solo-para-desarrollo')
 DEBUG = env.bool('DEBUG', default=True)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
-# Render asigna su propio hostname en esta variable. Si existe, lo agregamos
-# a ALLOWED_HOSTS y a CSRF_TRUSTED_ORIGINS para que el sitio responda y los
-# formularios no fallen con error 403.
+# Render asigna su propio hostname en esta variable.
 RENDER_EXTERNAL_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME', default='')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    CSRF_TRUSTED_ORIGINS = [f'https://{RENDER_EXTERNAL_HOSTNAME}']
+
+# Orígenes de confianza para POST (CSRF). Django exige el esquema https://
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+
+# ── HTTPS detrás del proxy de Render ──────────────────────────────────────
+# Render termina el TLS y reenvía a Django por HTTP con X-Forwarded-Proto.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Cookies seguras solo en producción (en local con http:// no se enviarían)
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 
 # ── Apps instaladas ───────────────────────────────────────────────────────
 # jazzmin debe ir ANTES de django.contrib.admin
