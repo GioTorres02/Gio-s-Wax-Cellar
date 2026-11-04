@@ -24,6 +24,7 @@
     font-family: 'JetBrains Mono', Consolas, monospace !important;
     font-size: .9em;
 }
+
 /* ── JAZZMIN: Override de colores con Fable 5 AzulERP ─────────────────── */
 
 /* Sidebar color navy */
@@ -51,3 +52,17 @@
 
 /* Footer */
 .main-footer { border-top: 2px solid #B8860B; }
+
+/* ── Botón de factura PDF (estética Halloween) ───────────────────────── */
+.btn-erp-factura {
+    display: inline-block;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    background: #f08a24;
+    color: #2a1a0e;
+    font-weight: 700;
+    text-decoration: none;
+    border: 2px solid #2a1a0e;
+    box-shadow: 3px 3px 0 #2a1a0e;
+}
+.btn-erp-factura:hover { filter: brightness(1.08); }
