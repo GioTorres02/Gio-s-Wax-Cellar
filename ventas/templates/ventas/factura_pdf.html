@@ -4,17 +4,34 @@
     <meta charset="UTF-8">
     <title>Factura {{ pedido.numero_pedido|default:venta.pk }}</title>
     <style>
-        /* ── Paleta Halloween ERP ───────────────────────────────────
-           WeasyPrint 60.x no resuelve var() dentro de propiedades
-           abreviadas (border, background), así que los colores van fijos:
-           noche #2A1A0E · tarjeta #3B2314 · naranja #E8731F
-           naranja-oscuro #B8461B · amarillo #F2C91B · crema #FFF6E3
-           texto #2B1D12 · texto-suave #6B5444 · línea #E9D8BE        */
+        /* ── Paleta "Gio's Wax Cellar" ──────────────────────────────
+           WeasyPrint no resuelve var(), así que los colores van fijos:
+           café oscuro #2A1A10 · ámbar #F0B547 · naranja #FFB347
+           crema #F1E4C8 · crema claro #FFF6DC · café medio #5A3E2B
+           línea #D9C3A0                                              */
+
+        /* ── Tipografías ─────────────────────────────────────────────
+           Bevan y Special Elite son de Google Fonts. WeasyPrint no las
+           descarga solo: si las instalas en Windows, funcionan. Si no,
+           usa los respaldos (Georgia y Courier New).
+           Para embeberlas, descarga los .ttf, colócalos en static/fonts/
+           y descomenta el bloque @font-face de abajo.                  */
+        /*
+        @font-face {
+            font-family: 'Bevan';
+            src: url('static/fonts/Bevan-Regular.ttf');
+        }
+        @font-face {
+            font-family: 'Special Elite';
+            src: url('static/fonts/SpecialElite-Regular.ttf');
+        }
+        */
 
         /* ── Configuración de página ──────────────────────────────── */
         @page {
             size: A4 portrait;
             margin: 2cm 2cm 3cm 2cm;
+            background-color: #F1E4C8;
 
             /* Encabezado de empresa en cada página (excepto la primera) */
             @top-left {
@@ -25,20 +42,20 @@
             /* Número de página en el pie */
             @bottom-right {
                 content: "Página " counter(page) " de " counter(pages);
-                font-family: Arial, sans-serif;
+                font-family: 'Special Elite', 'Courier New', monospace;
                 font-size: 8.5pt;
-                color: #6B5444;
-                border-top: 2px solid #E8731F;
+                color: #5A3E2B;
+                border-top: 3px solid #2A1A10;
                 padding-top: .3cm;
             }
 
             /* Nombre de empresa en el pie izquierdo */
             @bottom-left {
                 content: string(empresa-nombre);
-                font-family: Arial, sans-serif;
-                font-size: 8.5pt;
-                color: #B8461B;
-                border-top: 2px solid #E8731F;
+                font-family: 'Bevan', Georgia, serif;
+                font-size: 9pt;
+                color: #2A1A10;
+                border-top: 3px solid #2A1A10;
                 padding-top: .3cm;
             }
         }
@@ -51,9 +68,9 @@
         /* ── Reset base ─────────────────────────────────────────── */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 10.5pt;
-            color: #2B1D12;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            font-size: 10pt;
+            color: #2A1A10;
             line-height: 1.5;
         }
 
@@ -62,24 +79,36 @@
             position: running(header-running);
             display: flex;
             align-items: center;
-            border-bottom: 2px solid #F2C91B;
-            padding-bottom: .3cm;
+            background: #2A1A10;
+            color: #F1E4C8;
+            border-bottom: 4px solid #F0B547;
+            border-radius: 8px;
+            padding: 6px 12px;
         }
-        #header-running .empresa { font-weight: bold; margin-right: 12px; color: #2A1A0E; }
-        #header-running .folio   { margin-left: auto; color: #B8461B; font-weight: bold; }
+        #header-running .empresa {
+            font-family: 'Bevan', Georgia, serif;
+            font-size: 11pt;
+            color: #F0B547;
+            margin-right: 12px;
+        }
+        #header-running .folio {
+            margin-left: auto;
+            color: #FFB347;
+            font-weight: bold;
+        }
 
         /* String para el pie izquierdo */
         #empresa-string { string-set: empresa-nombre content(); }
 
         /* ── ENCABEZADO (primera página) ───────────────────────────── */
         .header {
-            background: #2A1A0E;
-            color: #FFF6E3;
-            padding: 18px 24px;
-            border: 3px solid #2A1A0E;
-            border-bottom: 5px solid #E8731F;
+            background: #2A1A10;
+            color: #F1E4C8;
+            padding: 18px 22px;
+            border: 3px solid #2A1A10;
+            border-bottom: 6px solid #F0B547;
+            border-right: 6px solid #F0B547;
             border-radius: 14px;
-            box-shadow: 4px 4px 0 #B8461B;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -90,64 +119,65 @@
             object-fit: contain;
             margin-right: 16px;
             border-radius: 50%;
-            border: 3px solid #F2C91B;
-            background: #3B2314;
+            border: 3px solid #F0B547;
+            background: #F1E4C8;
         }
         .header-logo-placeholder {
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: #F2C91B;
-            border: 3px solid #2A1A0E;
+            background: #F0B547;
+            border: 3px solid #F1E4C8;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Bevan', Georgia, serif;
             font-size: 14px;
-            font-weight: bold;
-            color: #2A1A0E;
+            color: #2A1A10;
             margin-right: 16px;
         }
         .header-title {
-            font-size: 22pt;
+            font-family: 'Bevan', Georgia, serif;
+            font-size: 24pt;
             font-weight: bold;
-            color: #F2C91B;
-            letter-spacing: .06em;
+            color: #F0B547;
+            letter-spacing: .02em;
         }
-        .header-empresa { color: #E6D3B3; font-size: 10pt; margin-top: 2px; }
+        .header-empresa { color: #F1E4C8; font-size: 10pt; margin-top: 2px; }
         .header-folio {
             margin-left: auto;
             text-align: right;
         }
         .header-folio .folio-num {
             display: inline-block;
+            font-family: 'Bevan', Georgia, serif;
             font-size: 14pt;
-            font-weight: bold;
-            color: #2A1A0E;
-            background: #F2C91B;
-            padding: 2px 12px;
-            border: 2px solid #2A1A0E;
+            color: #2A1A10;
+            background: #F0B547;
+            padding: 3px 14px;
+            border: 3px solid #F1E4C8;
             border-radius: 999px;
         }
-        .header-folio .folio-fech { color: #E6D3B3; font-size: 9pt; margin-top: 6px; }
+        .header-folio .folio-fech { color: #F1E4C8; font-size: 9pt; margin-top: 6px; }
 
         /* ── SECCIÓN DE DATOS DEL CLIENTE ──────────────────────────── */
         .datos-section { margin-bottom: 18px; }
         .datos-tabla {
             width: 100%;
             border-collapse: collapse;
-            border: 2px solid #2A1A0E;
+            border: 3px solid #2A1A10;
             border-radius: 10px;
         }
         .datos-tabla td {
-            padding: 5px 9px;
-            font-size: 9.5pt;
-            border: 1px solid #E9D8BE;
-            background: #FFFFFF;
+            padding: 6px 9px;
+            font-size: 9pt;
+            border: 1px solid #D9C3A0;
+            background: #FFF6DC;
         }
         .datos-tabla .lbl {
-            background: #FBEBD0;
+            background: #F0B547;
             font-weight: bold;
-            color: #3B2314;
+            color: #2A1A10;
             width: 28%;
         }
 
@@ -156,34 +186,36 @@
             width: 100%;
             border-collapse: collapse;
             margin: 18px 0;
-            border: 2px solid #2A1A0E;
+            border: 3px solid #2A1A10;
             border-spacing: 0;
         }
-        /* La propiedad que hace que WeasyPrint repita la cabecera */
+        /* Repetir la cabecera de la tabla en cada página */
         thead { display: table-header-group; }
         tfoot { display: table-footer-group; }
 
         .productos-tabla thead th {
-            background: #3B2314;
-            color: #F2C91B;
+            background: #2A1A10;
+            color: #F0B547;
             padding: 8px 11px;
+            font-family: 'Bevan', Georgia, serif;
             font-size: 9pt;
+            font-weight: normal;
             text-align: left;
             text-transform: uppercase;
             letter-spacing: .04em;
-            border-bottom: 3px solid #E8731F;
+            border-bottom: 4px solid #F0B547;
         }
         .productos-tabla thead th.num { text-align: right; }
         .productos-tabla tbody td {
             padding: 7px 11px;
             font-size: 9.5pt;
-            border-bottom: 1px solid #E9D8BE;
-            background: #FFFFFF;
+            border-bottom: 1px solid #D9C3A0;
+            background: #FFF6DC;
             /* Evitar cortar una fila entre dos páginas */
             page-break-inside: avoid;
         }
         .productos-tabla tbody td.num { text-align: right; }
-        .productos-tabla tbody tr:nth-child(even) td { background: #FBF1DE; }
+        .productos-tabla tbody tr:nth-child(even) td { background: #F7E7C4; }
 
         /* ── TOTALES ───────────────────────────────────────────────── */
         .total-section { margin-top: 12px; }
@@ -191,44 +223,44 @@
             width: 50%;
             margin-left: 50%;
             border-collapse: collapse;
-            border: 2px solid #2A1A0E;
+            border: 3px solid #2A1A10;
             border-radius: 10px;
         }
         .total-tabla td {
             padding: 6px 10px;
             font-size: 9.5pt;
-            border: 1px solid #E9D8BE;
-            background: #FFFFFF;
+            border: 1px solid #D9C3A0;
+            background: #FFF6DC;
         }
         .total-tabla .lbl {
-            background: #FBEBD0;
+            background: #F0B547;
             font-weight: bold;
-            color: #3B2314;
+            color: #2A1A10;
         }
         .total-tabla .val { text-align: right; }
         .total-tabla tr.final td {
-            background: #E8731F;
-            border-top: 2px solid #2A1A0E;
+            background: #2A1A10;
+            border-top: 3px solid #2A1A10;
             font-weight: bold;
-            font-size: 11.5pt;
-            color: #2A1A0E;
+            font-size: 11pt;
+            color: #F1E4C8;
         }
-        .total-tabla tr.final td.lbl { background: #E8731F; color: #2A1A0E; }
-        .total-tabla .val.gold { color: #2A1A0E; font-size: 12.5pt; }
+        .total-tabla tr.final td.lbl { background: #FFB347; color: #2A1A10; }
+        .total-tabla .val.gold { color: #F0B547; font-family: 'Bevan', Georgia, serif; font-size: 13pt; }
 
         /* ── NOTA LEGAL / PIE ─────────────────────────────────────── */
         .nota {
             margin-top: 24px;
             padding: 12px 16px;
-            border-left: 6px solid #E8731F;
+            border-left: 8px solid #F0B547;
             border-radius: 8px;
-            background: #FFF0C2;
+            background: #FFF6DC;
             font-size: 8.5pt;
-            color: #6B5444;
+            color: #5A3E2B;
             /* No cortar la nota entre páginas */
             page-break-inside: avoid;
         }
-        .nota strong { color: #B8461B; }
+        .nota strong { font-family: 'Bevan', Georgia, serif; color: #2A1A10; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -239,7 +271,7 @@
 -->
 <div id="header-running">
     <span class="empresa">{{ config.nombre_empresa }}</span>
-    {% if config.rfc %}<span style="color:#6B5444;font-size:8.5pt;">RFC: {{ config.rfc }}</span>{% endif %}
+    {% if config.rfc %}<span style="color:#F1E4C8;font-size:8.5pt;">RFC: {{ config.rfc }}</span>{% endif %}
     <span class="folio">Factura #{{ venta.pk|stringformat:"05d" }}</span>
 </div>
 
@@ -318,7 +350,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5" style="text-align:center;padding:16px;color:#6B5444;">
+            <td colspan="5" style="text-align:center;padding:16px;color:#5A3E2B;">
                 Sin líneas de detalle registradas.
             </td>
         </tr>
@@ -339,7 +371,7 @@
             <td class="val">${{ iva }}</td>
         </tr>
         <tr class="final">
-            <td class="lbl" style="font-size:11.5pt;">TOTAL</td>
+            <td class="lbl" style="font-size:11pt;">TOTAL</td>
             <td class="val gold">${{ total_con_iva }}</td>
         </tr>
     </table>
