@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Inicio{% endblock %}
 
 {% block extra_css %}
@@ -15,7 +16,7 @@
         background:var(--clr-navy); color:#F1E4C8; border:3px solid var(--clr-ink); border-radius:6px; box-shadow:var(--shadow-sm);
         font-family:'Special Elite',monospace; }
     .sonando-ahora .led { width:10px; height:10px; border-radius:50%; background:#555; flex-shrink:0; }
-    .sonando-ahora.on .led { background:#FFB347; box-shadow:0 0 10px 3px rgba(255,179,71,.8); }
+    .sonando-ahora.on .led { background:#FFB347; box-shadow:0 0 10px 3px rgba(255,179,71,.8); animation:parpadeo 1.2s ease-in-out infinite; }
     .sonando-ahora button { margin-left:auto; background:var(--clr-royal); border:2px solid var(--clr-ink); border-radius:4px;
         font-weight:700; padding:.1rem .7rem; color:var(--clr-ink); display:none; }
     .sonando-ahora.on button { display:block; }
@@ -45,6 +46,7 @@
         background:
             radial-gradient(circle at 78% 24%,var(--b) 0 17%,transparent 18%),
             linear-gradient(160deg,var(--a),var(--c));
+        background-size:cover; background-position:center;
         transition:transform .25s,box-shadow .25s; }
     .funda::after { content:""; position:absolute; inset:0; pointer-events:none;
         background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 2px,transparent 2px 5px); }
@@ -58,14 +60,40 @@
     .etiqueta { margin-top:1rem; padding:.55rem .8rem; background:#F1E4C8; color:#2A1A10; border:2px solid var(--clr-ink);
         border-radius:3px; box-shadow:3px 3px 0 var(--clr-ink); font-family:'Special Elite',monospace; transform:rotate(-.8deg); }
     .vinilo:nth-child(even) .etiqueta { transform:rotate(.8deg); }
+    .vinilo.sonando .etiqueta { box-shadow:6px 6px 0 var(--clr-ink); transform:rotate(0deg); }
     .etiqueta strong { display:block; font-family:'Bevan',serif; font-weight:400; font-size:1.15rem; }
     .etiqueta p { margin:.15rem 0 .45rem; font-size:.8rem; }
-    .etiqueta iframe { display:block; width:100%; height:152px; border:0; margin-bottom:.5rem; }
+
+    /* Reproductor de Spotify: oculto hasta que el vinilo suene */
+    .etiqueta iframe {
+        display:none;
+        width:100%;
+        height:152px;
+        border:2px solid var(--clr-ink);
+        border-radius:10px;
+        box-shadow:3px 3px 0 var(--clr-ink);
+        margin-bottom:.5rem;
+    }
+    .vinilo.sonando .etiqueta iframe { display:block; animation:aparece .5s ease; }
+
     .etiqueta a { display:none; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
         font-family:'Work Sans',sans-serif; font-weight:700; font-size:.82rem; padding:.15rem .8rem; text-decoration:none; }
     .vinilo.sonando .etiqueta a { display:inline-block; }
 
-    @media (prefers-reduced-motion: reduce) { .vinilo.sonando .disco-giro { animation:none; } .funda:hover { transform:none; } }
+    @keyframes gira { to { transform:rotate(360deg); } }
+    @keyframes aparece {
+        from { opacity:0; transform:translateY(-6px); }
+        to   { opacity:1; transform:none; }
+    }
+    @keyframes parpadeo {
+        0%, 100% { opacity:1; }
+        50% { opacity:.4; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .vinilo.sonando .disco-giro, .sonando-ahora.on .led, .vinilo.sonando .etiqueta iframe { animation:none; }
+        .funda:hover { transform:none; }
+    }
 </style>
 {% endblock %}
 
@@ -201,17 +229,17 @@
     /* ═══════════ TUS VINILOS ═══════════
        Un vinilo por módulo, en orden.
        - artista / disco : lo que se ve en la portada.
+       - img             : imagen propia dentro de static/img/ (opcional).
        - embed           : enlace de inserción de Spotify (/embed/track/...).
                            Si está vacío, el vinilo no muestra reproductor.
        - a, b, c         : colores de la portada y del centro del disco. */
     var VINILOS = [
-        { artista:'Sabrina Carpenter', disco:'Edición Gio #1', embed:'https://open.spotify.com/embed/track/2LU2CYKUZUc1iAErxJb1dK', a:'#F0B547', b:'#FFF6DC', c:'#B8431A' },
-        { artista:'Olivia Rodrigo',    disco:'Edición Gio #2', embed:'https://open.spotify.com/embed/track/5Jh1i0no3vJ9u4deXkb4aV', a:'#7B3FA0', b:'#F4A6D7', c:'#2A1240' },
-        { artista:'Tate McRae',        disco:'Edición Gio #3', embed:'https://open.spotify.com/embed/track/2sFepQNyl1WjpROruP8bJ0', a:'#3A3A4A', b:'#E8D8C0', c:'#0E0E16' },
-        { artista:'Adele',             disco:'Edición Gio #4', embed:'https://open.spotify.com/embed/track/70cHKK8bHAfJrOGVnfRG9J', a:'#2F5D7A', b:'#F1E4C8', c:'#0E2233' },
-        { artista:'KATSEYE',           disco:'Edición Gio #5', embed:'https://open.spotify.com/embed/track/3NxXZVLBdHsNMOaTvBaF3b', a:'#E83E8C', b:'#FFE45C', c:'#4A0F2E' },
-        { artista:'Ariana Grande',     disco:'Edición Gio #6', embed:'https://open.spotify.com/embed/track/6Im9k8u9iIzKMrmV7BWtlF', a:'#D98AA8', b:'#FFF1F5', c:'#6A2D47' },
-        { artista:'Malcolm Todd',      disco:'Edición Gio #7', embed:'https://open.spotify.com/embed/track/59c2xv2kMzYM6HR9oY6BIa', a:'#6B8E4E', b:'#F1E4C8', c:'#1F2E14' }
+        { artista:'Sabrina Carpenter', disco:'Edición Gio #1', img:'{% static "img/edicion1.jpg" %}', embed:'https://open.spotify.com/embed/track/2LU2CYKUZUc1iAErxJb1dK', a:'#F0B547', b:'#FFF6DC', c:'#B8431A' },
+        { artista:'Olivia Rodrigo',    disco:'Edición Gio #2', img:'{% static "img/edicion2.jpg" %}', embed:'https://open.spotify.com/embed/track/5Jh1i0no3vJ9u4deXkb4aV', a:'#7B3FA0', b:'#F4A6D7', c:'#2A1240' },
+        { artista:'Tate McRae',        disco:'Edición Gio #3', img:'{% static "img/edicion3.jpg" %}', embed:'https://open.spotify.com/embed/track/2sFepQNyl1WjpROruP8bJ0', a:'#3A3A4A', b:'#E8D8C0', c:'#0E0E16' },
+        { artista:'Adele',             disco:'Edición Gio #4', img:'{% static "img/edicion4.jpg" %}', embed:'https://open.spotify.com/embed/track/70cHKK8bHAfJrOGVnfRG9J', a:'#2F5D7A', b:'#F1E4C8', c:'#0E2233' },
+        { artista:'Ariana Grande',     disco:'Edición Gio #5', img:'{% static "img/edicion5.jpg" %}', embed:'https://open.spotify.com/embed/track/6Im9k8u9iIzKMrmV7BWtlF', a:'#D98AA8', b:'#FFF1F5', c:'#6A2D47' },
+        { artista:'Malcolm Todd',      disco:'Edición Gio #6', img:'{% static "img/edicion6.jpg" %}', embed:'https://open.spotify.com/embed/track/59c2xv2kMzYM6HR9oY6BIa', a:'#6B8E4E', b:'#F1E4C8', c:'#1F2E14' }
     ];
 
     var vinilos = document.querySelectorAll('.vinilo');
@@ -221,9 +249,11 @@
     /* ── Portadas y reproductor de Spotify ── */
     vinilos.forEach(function (el, i) {
         var v = VINILOS[i % VINILOS.length];
+        var funda = el.querySelector('.funda');
         el.style.setProperty('--a', v.a); el.style.setProperty('--b', v.b); el.style.setProperty('--c', v.c);
         el.querySelector('.funda-artista').textContent = v.artista;
         el.querySelector('.funda-disco').textContent = v.disco;
+        if (v.img) funda.style.backgroundImage = 'url(' + v.img + ')';
         if (v.embed) {
             var f = document.createElement('iframe');
             f.src = v.embed;
