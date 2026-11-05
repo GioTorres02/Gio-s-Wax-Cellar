@@ -97,6 +97,99 @@
             <a href="{{ m.url }}">Entrar al módulo</a>
         </div>
     </div>
+    {% empty %}
+    {# Respaldo: si la vista no manda 'modulos', se muestran estos #}
+    {% url 'reportes:inicio' as rep_inicio %}{% url 'reportes:lista' as rep_lista %}{% url 'reportes:dashboard' as rep_dash %}{% url 'reportes:index' as rep_index %}
+    <div class="vinilo" data-i="0">
+        <div class="vinilo-stage">
+            <div class="disco"><div class="disco-giro"><span>Productos</span></div></div>
+            <button type="button" class="funda" aria-label="Sacar el disco de Productos">
+                <span class="funda-icono" aria-hidden="true">💿</span>
+                <span class="funda-artista"></span>
+                <span class="funda-disco"></span>
+            </button>
+        </div>
+        <div class="etiqueta">
+            <strong>Productos</strong>
+            <p>Catálogo de discos y artículos</p>
+            <a href="{% url 'productos:lista' %}">Entrar al módulo</a>
+        </div>
+    </div>
+    <div class="vinilo" data-i="1">
+        <div class="vinilo-stage">
+            <div class="disco"><div class="disco-giro"><span>Clientes</span></div></div>
+            <button type="button" class="funda" aria-label="Sacar el disco de Clientes">
+                <span class="funda-icono" aria-hidden="true">🎧</span>
+                <span class="funda-artista"></span>
+                <span class="funda-disco"></span>
+            </button>
+        </div>
+        <div class="etiqueta">
+            <strong>Clientes</strong>
+            <p>Coleccionistas y compradores</p>
+            <a href="{% url 'clientes:lista' %}">Entrar al módulo</a>
+        </div>
+    </div>
+    <div class="vinilo" data-i="2">
+        <div class="vinilo-stage">
+            <div class="disco"><div class="disco-giro"><span>Proveedores</span></div></div>
+            <button type="button" class="funda" aria-label="Sacar el disco de Proveedores">
+                <span class="funda-icono" aria-hidden="true">🚚</span>
+                <span class="funda-artista"></span>
+                <span class="funda-disco"></span>
+            </button>
+        </div>
+        <div class="etiqueta">
+            <strong>Proveedores</strong>
+            <p>Distribuidores y sellos</p>
+            <a href="{% url 'proveedores:lista' %}">Entrar al módulo</a>
+        </div>
+    </div>
+    <div class="vinilo" data-i="3">
+        <div class="vinilo-stage">
+            <div class="disco"><div class="disco-giro"><span>Ventas</span></div></div>
+            <button type="button" class="funda" aria-label="Sacar el disco de Ventas">
+                <span class="funda-icono" aria-hidden="true">🧾</span>
+                <span class="funda-artista"></span>
+                <span class="funda-disco"></span>
+            </button>
+        </div>
+        <div class="etiqueta">
+            <strong>Ventas</strong>
+            <p>Caja y tickets de la tienda</p>
+            <a href="{% url 'ventas:lista' %}">Entrar al módulo</a>
+        </div>
+    </div>
+    <div class="vinilo" data-i="4">
+        <div class="vinilo-stage">
+            <div class="disco"><div class="disco-giro"><span>Reportes</span></div></div>
+            <button type="button" class="funda" aria-label="Sacar el disco de Reportes">
+                <span class="funda-icono" aria-hidden="true">📈</span>
+                <span class="funda-artista"></span>
+                <span class="funda-disco"></span>
+            </button>
+        </div>
+        <div class="etiqueta">
+            <strong>Reportes</strong>
+            <p>Lo más vendido del sótano</p>
+            <a href="{{ rep_inicio|default:rep_lista|default:rep_dash|default:rep_index|default:'#' }}">Entrar al módulo</a>
+        </div>
+    </div>
+    <div class="vinilo" data-i="5">
+        <div class="vinilo-stage">
+            <div class="disco"><div class="disco-giro"><span>Admin</span></div></div>
+            <button type="button" class="funda" aria-label="Sacar el disco de Admin">
+                <span class="funda-icono" aria-hidden="true">🔑</span>
+                <span class="funda-artista"></span>
+                <span class="funda-disco"></span>
+            </button>
+        </div>
+        <div class="etiqueta">
+            <strong>Admin</strong>
+            <p>Trastienda de Gio</p>
+            <a href="/admin/">Entrar al módulo</a>
+        </div>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}
