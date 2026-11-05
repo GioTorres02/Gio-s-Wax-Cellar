@@ -60,6 +60,7 @@
     .vinilo:nth-child(even) .etiqueta { transform:rotate(.8deg); }
     .etiqueta strong { display:block; font-family:'Bevan',serif; font-weight:400; font-size:1.15rem; }
     .etiqueta p { margin:.15rem 0 .45rem; font-size:.8rem; }
+    .etiqueta iframe { display:block; width:100%; height:152px; border:0; margin-bottom:.5rem; }
     .etiqueta a { display:none; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
         font-family:'Work Sans',sans-serif; font-weight:700; font-size:.82rem; padding:.15rem .8rem; text-decoration:none; }
     .vinilo.sonando .etiqueta a { display:inline-block; }
@@ -76,7 +77,7 @@
     <div class="sonando-ahora" id="ahora" role="status" aria-live="polite">
         <span class="led"></span>
         <span id="ahoraTxt">Toca una portada para sacar el disco</span>
-        <button type="button" id="ahoraStop">Pausar</button>
+        <button type="button" id="ahoraStop">Cerrar</button>
     </div>
 </div>
 
@@ -198,70 +199,48 @@
 <script>
 (function () {
     /* ═══════════ TUS VINILOS ═══════════
-       Edita esta lista: un vinilo por módulo, en orden (si hay más vinilos que módulos, los últimos no se muestran).
+       Un vinilo por módulo, en orden.
        - artista / disco : lo que se ve en la portada.
-       - audio           : ruta a TU archivo (ponlo en static/musica/). Si el archivo
-                           no existe, suena una melodía sintetizada original.
-       - a, b, c         : colores de la portada y del centro del disco.
-       - raiz, escala, bpm: carácter de la melodía de respaldo. */
+       - embed           : enlace de inserción de Spotify (/embed/track/...).
+                           Si está vacío, el vinilo no muestra reproductor.
+       - a, b, c         : colores de la portada y del centro del disco. */
     var VINILOS = [
-        { artista:'Sabrina Carpenter', disco:'Edición Gio #1', audio:'/static/musica/sabrina.mp3', a:'#F0B547', b:'#FFF6DC', c:'#B8431A', raiz:64, escala:[0,2,4,7,9,7,4,2],    bpm:110 },
-        { artista:'Olivia Rodrigo',    disco:'Edición Gio #2', audio:'/static/musica/olivia.mp3',  a:'#7B3FA0', b:'#F4A6D7', c:'#2A1240', raiz:60, escala:[0,2,3,7,8,7,3,2],    bpm:96 },
-        { artista:'Tate McRae',        disco:'Edición Gio #3', audio:'/static/musica/tate.mp3',    a:'#3A3A4A', b:'#E8D8C0', c:'#0E0E16', raiz:58, escala:[0,3,5,7,10,7,5,3],   bpm:100 },
-        { artista:'Adele',             disco:'Edición Gio #4', audio:'/static/musica/adele.mp3',   a:'#2F5D7A', b:'#F1E4C8', c:'#0E2233', raiz:53, escala:[0,4,7,12,11,7,4,0],  bpm:64 },
-        { artista:'KATSEYE',           disco:'Edición Gio #5', audio:'/static/musica/katseye.mp3', a:'#E83E8C', b:'#FFE45C', c:'#4A0F2E', raiz:66, escala:[0,4,7,9,12,9,7,4],   bpm:118 },
-        { artista:'Ariana Grande',     disco:'Edición Gio #6', audio:'/static/musica/ariana.mp3',  a:'#D98AA8', b:'#FFF1F5', c:'#6A2D47', raiz:62, escala:[0,4,7,11,12,11,7,4], bpm:84 },
-        { artista:'Malcolm Todd',      disco:'Edición Gio #7', audio:'/static/musica/malcolm.mp3', a:'#6B8E4E', b:'#F1E4C8', c:'#1F2E14', raiz:55, escala:[0,3,7,10,7,3,5,0],   bpm:90 }
+        { artista:'Sabrina Carpenter', disco:'Edición Gio #1', embed:'https://open.spotify.com/embed/track/2LU2CYKUZUc1iAErxJb1dK', a:'#F0B547', b:'#FFF6DC', c:'#B8431A' },
+        { artista:'Olivia Rodrigo',    disco:'Edición Gio #2', embed:'https://open.spotify.com/embed/track/5Jh1i0no3vJ9u4deXkb4aV', a:'#7B3FA0', b:'#F4A6D7', c:'#2A1240' },
+        { artista:'Tate McRae',        disco:'Edición Gio #3', embed:'https://open.spotify.com/embed/track/2sFepQNyl1WjpROruP8bJ0', a:'#3A3A4A', b:'#E8D8C0', c:'#0E0E16' },
+        { artista:'Adele',             disco:'Edición Gio #4', embed:'https://open.spotify.com/embed/track/70cHKK8bHAfJrOGVnfRG9J', a:'#2F5D7A', b:'#F1E4C8', c:'#0E2233' },
+        { artista:'KATSEYE',           disco:'Edición Gio #5', embed:'https://open.spotify.com/embed/track/3NxXZVLBdHsNMOaTvBaF3b', a:'#E83E8C', b:'#FFE45C', c:'#4A0F2E' },
+        { artista:'Ariana Grande',     disco:'Edición Gio #6', embed:'https://open.spotify.com/embed/track/6Im9k8u9iIzKMrmV7BWtlF', a:'#D98AA8', b:'#FFF1F5', c:'#6A2D47' },
+        { artista:'Malcolm Todd',      disco:'Edición Gio #7', embed:'https://open.spotify.com/embed/track/59c2xv2kMzYM6HR9oY6BIa', a:'#6B8E4E', b:'#F1E4C8', c:'#1F2E14' }
     ];
 
     var vinilos = document.querySelectorAll('.vinilo');
     var ahora = document.getElementById('ahora'), txt = document.getElementById('ahoraTxt');
-    var audioEl = null, synth = null, actual = null;
+    var actual = null;
 
-    /* ── Portadas ── */
+    /* ── Portadas y reproductor de Spotify ── */
     vinilos.forEach(function (el, i) {
         var v = VINILOS[i % VINILOS.length];
         el.style.setProperty('--a', v.a); el.style.setProperty('--b', v.b); el.style.setProperty('--c', v.c);
         el.querySelector('.funda-artista').textContent = v.artista;
         el.querySelector('.funda-disco').textContent = v.disco;
+        if (v.embed) {
+            var f = document.createElement('iframe');
+            f.src = v.embed;
+            f.width = '100%';
+            f.height = '152';
+            f.frameBorder = '0';
+            f.loading = 'lazy';
+            f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+            f.title = 'Reproductor de Spotify: ' + v.artista;
+            el.querySelector('.etiqueta').insertBefore(f, el.querySelector('.etiqueta a'));
+        }
     });
 
-    /* ── Melodía de respaldo (Web Audio, original, con crujido de vinilo) ── */
-    function arrancarSynth(v) {
-        var AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return null;
-        var ctx = new AC(), out = ctx.createGain(); out.gain.value = .35; out.connect(ctx.destination);
-        // crujido
-        var buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = buf.getChannelData(0);
-        for (var k = 0; k < d.length; k++) d[k] = Math.random() < .0009 ? (Math.random() * 2 - 1) * .8 : 0;
-        var ruido = ctx.createBufferSource(); ruido.buffer = buf; ruido.loop = true;
-        var g = ctx.createGain(); g.gain.value = .5; ruido.connect(g); g.connect(out); ruido.start();
-        var paso = 0, dur = 60 / v.bpm, vivo = true;
-        function nota(semi, t, largo, tipo, vol) {
-            var o = ctx.createOscillator(), e = ctx.createGain();
-            o.type = tipo; o.frequency.value = 440 * Math.pow(2, (semi - 69) / 12);
-            e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(vol, t + .03);
-            e.gain.exponentialRampToValueAtTime(.0001, t + largo);
-            o.connect(e); e.connect(out); o.start(t); o.stop(t + largo + .05);
-        }
-        function tick() {
-            if (!vivo) return;
-            var t = ctx.currentTime + .05, s = v.escala[paso % v.escala.length];
-            nota(v.raiz + s, t, dur * 1.6, 'triangle', .35);
-            if (paso % 2 === 0) nota(v.raiz - 12 + (paso % 8 < 4 ? 0 : 5), t, dur * 1.9, 'sine', .45);
-            if (paso % 4 === 3) nota(v.raiz + 12 + s, t + dur / 2, dur, 'sine', .12);
-            paso++;
-            setTimeout(tick, dur * 1000);
-        }
-        tick();
-        return { stop: function () { vivo = false; try { ctx.close(); } catch (e) {} } };
-    }
-
     function parar() {
-        if (audioEl) { audioEl.pause(); audioEl = null; }
-        if (synth) { synth.stop(); synth = null; }
         vinilos.forEach(function (x) { x.classList.remove('sonando'); });
-        ahora.classList.remove('on'); txt.textContent = 'Toca una portada para sacar el disco';
+        ahora.classList.remove('on');
+        txt.textContent = 'Toca una portada para sacar el disco';
         actual = null;
     }
 
@@ -269,10 +248,7 @@
         var v = VINILOS[+el.dataset.i % VINILOS.length];
         parar(); actual = el;
         el.classList.add('sonando'); ahora.classList.add('on');
-        txt.textContent = 'Sonando: ' + v.artista + ' · ' + v.disco;
-        var a = new Audio(v.audio); a.loop = true; audioEl = a;
-        a.addEventListener('error', function () { if (audioEl === a) { audioEl = null; synth = arrancarSynth(v); } });
-        a.play().catch(function () { if (audioEl === a && a.error) return; });
+        txt.textContent = 'Reproductor de: ' + v.artista + ' · ' + v.disco;
     }
 
     vinilos.forEach(function (el) {
@@ -281,7 +257,6 @@
         });
     });
     document.getElementById('ahoraStop').addEventListener('click', parar);
-    window.addEventListener('pagehide', parar);
 })();
 </script>
 {% endblock %}
