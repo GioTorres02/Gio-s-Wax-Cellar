@@ -64,15 +64,14 @@
     .etiqueta strong { display:block; font-family:'Bevan',serif; font-weight:400; font-size:1.15rem; }
     .etiqueta p { margin:.15rem 0 .45rem; font-size:.8rem; }
 
-    /* Reproductor de Spotify: oculto hasta que el vinilo suene */
+    /* Reproductor de Spotify: compacto y oculto hasta que el vinilo suene */
     .etiqueta iframe {
         display:none;
         width:100%;
-        height:152px;
-        border:2px solid var(--clr-ink);
-        border-radius:10px;
-        box-shadow:3px 3px 0 var(--clr-ink);
-        margin-bottom:.5rem;
+        height:80px;
+        border:0;
+        border-radius:12px;
+        margin:.4rem 0 .6rem;
     }
     .vinilo.sonando .etiqueta iframe { display:block; animation:aparece .5s ease; }
 
@@ -258,7 +257,7 @@
             var f = document.createElement('iframe');
             f.src = v.embed;
             f.width = '100%';
-            f.height = '152';
+            f.height = '80';
             f.frameBorder = '0';
             f.loading = 'lazy';
             f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
