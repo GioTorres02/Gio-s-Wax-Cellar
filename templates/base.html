@@ -3,519 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#3B2314">
-    <title>{% block title %}ERP Django{% endblock %} · UTEC Celaya</title>
+    <meta name="theme-color" content="#1C100A">
+    <title>{% block title %}ERP Django{% endblock %} · Gio's Wax Cellar</title>
 
-    <!-- Google Fonts: Chewy (títulos retro) + Nunito (cuerpo) + JetBrains Mono -->
+    <!-- Bevan (rótulos de tienda) + Work Sans (cuerpo) + Special Elite (etiquetas de precio) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bevan&family=Work+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- Halloween retro — Design System -->
     <style>
-        /* ══════════ TOKENS · MODO NOCHE (chocolate con estrellitas) ══════════
+        /* ══════════ TOKENS · NOCHE (sótano de ladrillo, focos ámbar) ══════════
            Se conservan los nombres --clr-* para no romper otras plantillas. */
         :root, [data-theme="dark"] {
-            --clr-navy   : #2A180D;   /* chocolate oscuro (barras)   */
-            --clr-royal  : #E8731F;   /* calabaza                    */
-            --clr-sky    : #F2D21B;   /* amarillo del óvalo          */
-            --clr-ice    : #44291A;   /* filas pares                 */
-            --clr-gold   : #F2D21B;
-            --clr-amber  : #F5A623;
-            --clr-cream  : #4F3220;
-            --clr-bg     : #3B2314;   /* fondo café                  */
-            --clr-surface: #4B2D1B;
-            --clr-text   : #F8EBC4;   /* crema                       */
-            --clr-muted  : #CDB48C;
-            --clr-border : #2A180D;
-            --clr-danger : #FF6B4A;
-            --clr-ok     : #9BD16B;
-            --clr-ink    : #140C07;   /* contorno de tinta           */
-            --clr-rust   : #B8431A;
-            --clr-title  : #F2D21B;
-            --clr-code   : #F5A623;
-            --stars      : url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='400' fill='none' stroke='%23F3E6B0' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round'><g id='s'><path transform='translate(40 30) rotate(10)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(150 70) rotate(-15) scale(.9)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(260 25) rotate(20) scale(1.1)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(95 140) rotate(5) scale(.8)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(220 170) rotate(-10)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(300 120) rotate(15) scale(.7)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(30 230) rotate(-20)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(140 260) rotate(12) scale(.9)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(250 300) rotate(-5) scale(1.1)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(70 350) rotate(18) scale(.8)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(190 370) rotate(-12)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(305 215) rotate(8) scale(.8)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/></g></svg>");
-            --shadow-sm  : 3px 3px 0 var(--clr-ink);
-            --shadow-md  : 5px 5px 0 var(--clr-ink);
+            --clr-navy:#1C100A; --clr-royal:#FFB347; --clr-sky:#E5A32B; --clr-ice:#33200F;
+            --clr-gold:#FFB347; --clr-amber:#FFC56E; --clr-cream:#44291A;
+            --clr-bg:#2B1A12; --clr-surface:#3A2418; --clr-text:#F1E4C8; --clr-muted:#C9B08A;
+            --clr-border:#1C100A; --clr-danger:#FF7A59; --clr-ok:#9BCB6B; --clr-ink:#0E0805;
+            --clr-rust:#9C3B1F; --clr-title:#FFB347; --clr-code:#FFC56E;
+            --shadow-sm:3px 3px 0 var(--clr-ink); --shadow-md:6px 6px 0 var(--clr-ink);
         }
-        /* ══════════ TOKENS · MODO DÍA (papel crema de calabaza) ══════════ */
+        /* ══════════ TOKENS · DÍA (tienda con luz de ventana) ══════════ */
         [data-theme="light"] {
-            --clr-navy   : #3B2314;
-            --clr-royal  : #E8731F;
-            --clr-sky    : #F2B91B;
-            --clr-ice    : #FCEBB9;
-            --clr-gold   : #C25A0E;
-            --clr-amber  : #E8731F;
-            --clr-cream  : #FFF2C2;
-            --clr-bg     : #FBEFC9;
-            --clr-surface: #FFF9E6;
-            --clr-text   : #2E1A0D;
-            --clr-muted  : #7B5B3E;
-            --clr-border : #D9B96E;
-            --clr-danger : #B3261E;
-            --clr-ok     : #2F7A2B;
-            --clr-title  : #C25A0E;
-            --clr-code   : #B8431A;
-            --stars      : url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='400' fill='none' stroke='%23E0AE4A' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round'><path transform='translate(40 30) rotate(10)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(150 70) rotate(-15) scale(.9)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(260 25) rotate(20) scale(1.1)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(95 140) rotate(5) scale(.8)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(220 170) rotate(-10)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(300 120) rotate(15) scale(.7)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(30 230) rotate(-20)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(140 260) rotate(12) scale(.9)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(250 300) rotate(-5) scale(1.1)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(70 350) rotate(18) scale(.8)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(190 370) rotate(-12)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(305 215) rotate(8) scale(.8)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/></svg>");
-            --shadow-sm  : 3px 3px 0 var(--clr-ink);
-            --shadow-md  : 5px 5px 0 var(--clr-ink);
+            --clr-navy:#3B2314; --clr-royal:#D9822B; --clr-sky:#F0B547; --clr-ice:#F6E6C4;
+            --clr-gold:#9C3B1F; --clr-amber:#D9822B; --clr-cream:#F3DDB0;
+            --clr-bg:#E7CFA8; --clr-surface:#FFF6E2; --clr-text:#2A1A10; --clr-muted:#7B5B3E;
+            --clr-border:#C9A672; --clr-danger:#B3261E; --clr-ok:#2F7A2B; --clr-title:#9C3B1F; --clr-code:#9C3B1F;
         }
-        :root { --tw: clamp(120px, 15vw, 250px); --th: calc(var(--tw) * 1.909); }
 
-        /* ══════════ BASE ══════════ */
-        *, *::before, *::after { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing:border-box; }
         body {
-            font-family: 'Nunito','Segoe UI',sans-serif;
-            font-size: 15.5px;
-            background-color: var(--clr-bg);
-            background-image: var(--stars);
-            background-size: 320px 400px;
-            color: var(--clr-text);
-            line-height: 1.6;
-            transition: background-color .25s, color .25s;
-            margin: 0;
+            font-family:'Work Sans','Segoe UI',sans-serif; font-size:15.5px; line-height:1.6; margin:0;
+            color:var(--clr-text); background-color:var(--clr-bg);
+            /* pared de ladrillo */
+            background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='112' height='56' fill='none' stroke='%23000' stroke-opacity='.28' stroke-width='3'><path d='M0 0H112M0 28H112M0 56H112M56 0V28M0 28V56M112 28V56'/></svg>");
+            background-size:112px 56px;
+            transition:background-color .25s,color .25s;
         }
-        a:focus-visible, button:focus-visible, .erp-input:focus-visible {
-            outline: 3px solid var(--clr-sky); outline-offset: 2px;
+        body::after { /* viñeta: luz cálida al centro */
+            content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+            background:radial-gradient(ellipse at 50% 30%, rgba(255,179,71,.14), rgba(0,0,0,.45) 85%);
         }
+        [data-theme="light"] body::after { background:radial-gradient(ellipse at 50% 20%, rgba(255,255,255,.35), rgba(120,60,20,.22) 90%); }
+        a:focus-visible, button:focus-visible, .erp-input:focus-visible { outline:3px solid var(--clr-royal); outline-offset:2px; }
 
-        /* ══════════ ÁRBOLES + HOJITAS (decoración fija a los lados) ══════════ */
-        .tree {
-            position: fixed; bottom: 0; width: var(--tw); height: var(--th);
-            z-index: 0; pointer-events: none;
-        }
-        .tree-l { left: -6px; }
-        .tree-r { right: -6px; transform: scaleX(-1); }
-        .leaf-zone {
-            position: fixed; bottom: 0; width: var(--tw); height: var(--th);
-            --h: var(--th);
-            z-index: 0; pointer-events: none;
-        }
-        .leaf-zone.l { left: -6px; }
-        .leaf-zone.r { right: -6px; }
-        .leaf {
-            position: absolute; display: block;
-            background-size: contain; background-repeat: no-repeat;
-            --fall: calc((100 - var(--t)) * var(--h) / 100);
-            top: calc(var(--t) * 1%);
-            opacity: 0;
-            animation: caer linear infinite;
-        }
-        .leaf.c0 { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 26'><path d='M12 1C21 8 21 19 12 25C3 19 3 8 12 1Z' fill='%23E8731F' stroke='%23140C07' stroke-width='1.6' stroke-linejoin='round'/><path d='M12 6V25' stroke='%23140C07' stroke-width='1.2'/></svg>"); }
-        .leaf.c1 { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 26'><path d='M12 1C21 8 21 19 12 25C3 19 3 8 12 1Z' fill='%23F2B91B' stroke='%23140C07' stroke-width='1.6' stroke-linejoin='round'/><path d='M12 6V25' stroke='%23140C07' stroke-width='1.2'/></svg>"); }
-        .leaf.c2 { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 26'><path d='M12 1C21 8 21 19 12 25C3 19 3 8 12 1Z' fill='%23B8431A' stroke='%23140C07' stroke-width='1.6' stroke-linejoin='round'/><path d='M12 6V25' stroke='%23140C07' stroke-width='1.2'/></svg>"); }
-        @keyframes caer {
-            0%   { opacity: 0; transform: translate(0,0) rotate(0deg); }
-            8%   { opacity: 1; }
-            50%  { transform: translate(calc(var(--dx) * .45), calc(var(--fall) * .5)) rotate(calc(var(--rot) * .5)); }
-            88%  { opacity: 1; }
-            100% { opacity: 0; transform: translate(var(--dx), var(--fall)) rotate(var(--rot)); }
-        }
-
-        /* ══════════ NAVBAR ══════════ */
+        /* ══════════ NAVBAR (letrero de madera) ══════════ */
         .erp-navbar {
-            position: relative; z-index: 3;
-            background: var(--clr-navy);
-            border-bottom: 4px solid var(--clr-royal);
-            box-shadow: 0 4px 0 var(--clr-ink);
-            padding: .7rem 1.5rem;
-            display: flex; align-items: center;
-            justify-content: space-between; flex-wrap: wrap; gap: .5rem;
+            position:relative; z-index:5; padding:.7rem 1.5rem;
+            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem;
+            background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 9px),var(--clr-navy);
+            border-bottom:4px solid var(--clr-royal); box-shadow:0 4px 0 var(--clr-ink);
         }
-        .erp-brand {
-            font-family: 'Chewy','Nunito',cursive;
-            font-size: 1.7rem; font-weight: 400;
-            color: var(--clr-royal) !important;
-            text-decoration: none; letter-spacing: .02em;
-            text-shadow: 2px 2px 0 var(--clr-ink);
-        }
-        .erp-brand span {
-            color: #F8EBC4; font-family: 'Nunito',sans-serif;
-            font-weight: 600; font-size: .5em; letter-spacing: .06em;
-            text-shadow: none;
-        }
-        .erp-nav-links { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; }
-        .erp-nav-link {
-            color: #F8EBC4 !important;
-            font-size: .93rem; font-weight: 700;
-            padding: .3rem .85rem; border-radius: 999px;
-            border: 2px solid transparent;
-            text-decoration: none;
-            transition: background .15s, color .15s, border-color .15s;
-        }
-        .erp-nav-link:hover {
-            background: var(--clr-sky); color: var(--clr-ink) !important;
-            border-color: var(--clr-ink);
-        }
-        .erp-nav-link.active {
-            background: var(--clr-royal); color: var(--clr-ink) !important;
-            border-color: var(--clr-ink);
-        }
-        .theme-toggle {
-            background: var(--clr-sky); color: var(--clr-ink);
-            border: 2.5px solid var(--clr-ink); border-radius: 50%;
-            width: 34px; height: 34px; font-size: .95rem;
-            cursor: pointer; margin-left: .4rem;
-            box-shadow: 2px 2px 0 var(--clr-ink);
-            transition: transform .15s, box-shadow .15s;
-        }
-        .theme-toggle:hover { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--clr-ink); }
+        .erp-brand { display:flex; align-items:center; gap:.7rem; text-decoration:none;
+            font-family:'Bevan',serif; font-size:1.55rem; color:var(--clr-royal) !important; text-shadow:2px 2px 0 var(--clr-ink); }
+        .erp-brand small { font-family:'Special Elite',monospace; font-size:.62em; color:#F1E4C8; text-shadow:none; letter-spacing:.04em; }
+        .mini-disco { width:34px; height:34px; border-radius:50%; flex-shrink:0; border:2px solid #000;
+            background:radial-gradient(circle,var(--clr-royal) 0 22%,#000 23% 26%,transparent 27%),
+                       repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px);
+            animation:gira 4s linear infinite; }
+        @keyframes gira { to { transform:rotate(360deg); } }
+        .erp-nav-links { display:flex; align-items:center; gap:.25rem; flex-wrap:wrap; }
+        .erp-nav-link { color:#F1E4C8 !important; font-size:.93rem; font-weight:700; padding:.3rem .85rem;
+            border-radius:6px; border:2px solid transparent; text-decoration:none; transition:background .15s,color .15s; }
+        .erp-nav-link:hover { background:var(--clr-royal); color:var(--clr-ink) !important; border-color:var(--clr-ink); }
+        .erp-nav-link.active { background:var(--clr-cream); color:var(--clr-royal) !important; border-color:var(--clr-royal); }
+        .theme-toggle { background:var(--clr-royal); color:var(--clr-ink); border:2.5px solid var(--clr-ink);
+            border-radius:50%; width:34px; height:34px; cursor:pointer; margin-left:.4rem; box-shadow:2px 2px 0 var(--clr-ink); }
+        .theme-toggle:hover { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--clr-ink); }
+
+        /* ══════════ FOCOS COLGANTES ══════════ */
+        .focos { position:relative; z-index:4; height:0; pointer-events:none; }
+        .foco { position:absolute; top:0; width:2px; background:#0E0805; transform-origin:top; animation:mece 6s ease-in-out infinite; }
+        .foco::after { content:""; position:absolute; left:50%; bottom:-14px; width:16px; height:20px; transform:translateX(-50%);
+            border-radius:50% 50% 45% 45%; background:radial-gradient(circle at 50% 35%,#FFF3C4,#FFB347 70%);
+            box-shadow:0 0 18px 8px rgba(255,179,71,.55); }
+        @keyframes mece { 0%,100%{transform:rotate(-1.2deg)} 50%{transform:rotate(1.2deg)} }
 
         /* ══════════ CONTENIDO ══════════ */
-        .erp-main { position: relative; z-index: 1; padding: 2.5rem 0; min-height: calc(100vh - 110px); }
-        .container { position: relative; z-index: 1; }
+        .erp-main { position:relative; z-index:1; padding:2.5rem 0; min-height:calc(100vh - 110px); }
+        .container { position:relative; z-index:1; }
 
-        /* ══════════ TARJETAS ══════════ */
-        .erp-card {
-            background: var(--clr-surface);
-            border: 3px solid var(--clr-ink);
-            border-radius: 22px; box-shadow: var(--shadow-md);
-            padding: 1.5rem; margin-bottom: 1.75rem;
-        }
-        .erp-card-header {
-            background: var(--clr-sky); color: var(--clr-ink);
-            border-radius: 18px 18px 0 0;
-            border-bottom: 3px solid var(--clr-ink);
-            padding: .7rem 1.25rem;
-            font-family: 'Chewy','Nunito',cursive;
-            font-size: 1.3rem; letter-spacing: .02em;
-            margin: -1.5rem -1.5rem 1.5rem;
-        }
+        /* ══════════ TARJETAS (fundas de disco) ══════════ */
+        .erp-card { background:var(--clr-surface); border:3px solid var(--clr-ink); border-radius:6px;
+            box-shadow:var(--shadow-md); padding:1.5rem; margin-bottom:1.75rem; }
+        .erp-card-header { background:var(--clr-royal); color:var(--clr-ink); border-bottom:3px solid var(--clr-ink);
+            border-radius:3px 3px 0 0; padding:.6rem 1.25rem; font-family:'Bevan',serif; font-size:1.2rem; margin:-1.5rem -1.5rem 1.5rem; }
 
-        /* ══════════ TABLAS ══════════ */
-        .erp-table {
-            width: 100%; border-collapse: separate; border-spacing: 0;
-            border: 3px solid var(--clr-ink);
-            border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-md);
-        }
-        .erp-table thead th {
-            background: var(--clr-ink); color: #F2D21B;
-            font-family: 'Chewy','Nunito',cursive; font-weight: 400;
-            font-size: 1.05rem; letter-spacing: .04em;
-            padding: .75rem 1rem; border-bottom: 4px solid var(--clr-royal);
-        }
-        .erp-table tbody td {
-            background: var(--clr-surface); padding: .65rem 1rem;
-            border-bottom: 1px dashed var(--clr-border); font-size: .92rem;
-        }
-        .erp-table tbody tr:nth-child(even) td { background: var(--clr-ice); }
-        .erp-table tbody tr:hover td { background: rgba(232,115,31,.22); }
-        .erp-table tfoot td {
-            background: var(--clr-cream); color: var(--clr-gold);
-            font-weight: 800; border-top: 3px solid var(--clr-ink);
-        }
+        /* ══════════ TABLAS (lista de precios) ══════════ */
+        .erp-table { width:100%; border-collapse:separate; border-spacing:0; border:3px solid var(--clr-ink);
+            border-radius:6px; overflow:hidden; box-shadow:var(--shadow-md); }
+        .erp-table thead th { background:var(--clr-ink); color:var(--clr-royal); font-family:'Bevan',serif; font-weight:400;
+            letter-spacing:.04em; padding:.75rem 1rem; border-bottom:4px solid var(--clr-royal); }
+        .erp-table tbody td { background:var(--clr-surface); padding:.65rem 1rem; border-bottom:1px dashed var(--clr-border); font-size:.92rem; }
+        .erp-table tbody tr:nth-child(even) td { background:var(--clr-ice); }
+        .erp-table tbody tr:hover td { background:rgba(255,179,71,.22); }
+        .erp-table tfoot td { background:var(--clr-cream); color:var(--clr-gold); font-weight:800; border-top:3px solid var(--clr-ink); }
 
-        /* ══════════ BOTONES (estilo sticker) ══════════ */
-        .btn-erp-primary, .btn-erp-gold, .btn-erp-danger {
-            border: 2.5px solid var(--clr-ink); border-radius: 999px;
-            box-shadow: 3px 3px 0 var(--clr-ink);
-            padding: .42rem 1.3rem; font-weight: 800; font-size: .9rem;
-            cursor: pointer; text-decoration: none; display: inline-block;
-            transition: transform .12s, box-shadow .12s, background .15s;
-        }
-        .btn-erp-primary:hover, .btn-erp-gold:hover, .btn-erp-danger:hover {
-            transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--clr-ink);
-        }
-        .btn-erp-primary { background: var(--clr-royal); color: var(--clr-ink); }
-        .btn-erp-primary:hover { background: var(--clr-amber); color: var(--clr-ink); }
-        .btn-erp-gold { background: var(--clr-sky); color: var(--clr-ink); }
-        .btn-erp-gold:hover { background: #FFE45C; color: var(--clr-ink); }
-        .btn-erp-danger { background: #D9381E; color: #FFF6DC; }
-        .btn-erp-danger:hover { background: #B82C15; color: #FFF6DC; }
-        .btn-erp-sm { padding: .2rem .75rem; font-size: .8rem; box-shadow: 2px 2px 0 var(--clr-ink); }
+        /* ══════════ BOTONES (etiqueta de precio) ══════════ */
+        .btn-erp-primary,.btn-erp-gold,.btn-erp-danger { border:2.5px solid var(--clr-ink); border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink);
+            padding:.42rem 1.3rem; font-weight:700; font-size:.9rem; cursor:pointer; text-decoration:none; display:inline-block;
+            transition:transform .12s,box-shadow .12s,background .15s; }
+        .btn-erp-primary:hover,.btn-erp-gold:hover,.btn-erp-danger:hover { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--clr-ink); }
+        .btn-erp-primary { background:var(--clr-royal); color:var(--clr-ink); }
+        .btn-erp-primary:hover { background:var(--clr-amber); color:var(--clr-ink); }
+        .btn-erp-gold { background:#F1E4C8; color:var(--clr-ink); }
+        .btn-erp-gold:hover { background:#fff3d6; color:var(--clr-ink); }
+        .btn-erp-danger { background:#C0391B; color:#FFF6DC; }
+        .btn-erp-danger:hover { background:#9C2E15; color:#FFF6DC; }
+        .btn-erp-sm { padding:.2rem .75rem; font-size:.8rem; box-shadow:2px 2px 0 var(--clr-ink); }
 
         /* ══════════ FORMULARIOS ══════════ */
-        .erp-label {
-            font-family: 'Chewy','Nunito',cursive; font-size: 1rem; letter-spacing: .03em;
-            color: var(--clr-muted);
-            display: block; margin-bottom: .25rem;
-        }
-        .erp-input {
-            background: var(--clr-surface); border: 2.5px solid var(--clr-ink);
-            border-radius: 14px; color: var(--clr-text);
-            padding: .5rem .9rem; width: 100%; font-size: .95rem;
-            transition: box-shadow .15s, border-color .15s;
-        }
-        .erp-input:focus {
-            outline: none; border-color: var(--clr-royal);
-            box-shadow: 0 0 0 4px rgba(242,210,27,.45);
-        }
+        .erp-label { font-family:'Special Elite',monospace; font-size:.95rem; color:var(--clr-muted); display:block; margin-bottom:.25rem; }
+        .erp-input { background:var(--clr-surface); border:2.5px solid var(--clr-ink); border-radius:4px; color:var(--clr-text);
+            padding:.5rem .9rem; width:100%; font-size:.95rem; }
+        .erp-input:focus { outline:none; border-color:var(--clr-royal); box-shadow:0 0 0 4px rgba(255,179,71,.4); }
 
-        /* ══════════ BADGES ══════════ */
-        .badge-erp-active, .badge-erp-inactive, .badge-erp-gold {
-            border: 2px solid var(--clr-ink);
-            font-size: .76rem; padding: .15rem .7rem;
-            border-radius: 20px; font-weight: 800; color: var(--clr-ink);
-        }
-        .badge-erp-active   { background: #9BD16B; }
-        .badge-erp-inactive { background: #FF8A6B; }
-        .badge-erp-gold     { background: var(--clr-sky); }
+        /* ══════════ BADGES / ALERTAS ══════════ */
+        .badge-erp-active,.badge-erp-inactive,.badge-erp-gold { border:2px solid var(--clr-ink); font-family:'Special Elite',monospace;
+            font-size:.78rem; padding:.12rem .7rem; border-radius:4px; color:var(--clr-ink); }
+        .badge-erp-active{background:#9BCB6B} .badge-erp-inactive{background:#FF9A7A} .badge-erp-gold{background:var(--clr-royal)}
+        .erp-alert-danger,.erp-alert-info,.erp-alert-success { border:2.5px solid var(--clr-ink); border-radius:6px;
+            box-shadow:var(--shadow-sm); padding:.9rem 1.25rem; color:var(--clr-ink); }
+        .erp-alert-danger{background:#FF9A7A} .erp-alert-info{background:#FFC56E} .erp-alert-success{background:#9BCB6B}
 
-        /* ══════════ ALERTAS ══════════ */
-        .erp-alert-danger, .erp-alert-info, .erp-alert-success {
-            border: 2.5px solid var(--clr-ink); border-radius: 16px;
-            box-shadow: var(--shadow-sm); padding: .9rem 1.25rem; color: var(--clr-ink);
-        }
-        .erp-alert-danger  { background: #FF8A6B; }
-        .erp-alert-info    { background: #F2D21B; }
-        .erp-alert-success { background: #9BD16B; }
+        /* ══════════ TÍTULO DE PÁGINA (con disco giratorio) ══════════ */
+        .erp-page-title { display:flex; align-items:center; gap:1rem; margin-bottom:1.75rem; padding-bottom:.75rem; border-bottom:3px dashed var(--clr-border); }
+        .erp-page-title::before { content:""; flex-shrink:0; width:46px; height:46px; border-radius:50%; border:2px solid #000;
+            background:radial-gradient(circle,var(--clr-royal) 0 22%,#000 23% 26%,transparent 27%),repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px);
+            animation:gira 6s linear infinite; }
+        .erp-page-title h2 { font-family:'Bevan',serif; font-weight:400; font-size:2.3rem; line-height:1.1; color:var(--clr-title); margin:0; }
+        [data-theme="dark"] .erp-page-title h2 { text-shadow:2px 2px 0 var(--clr-ink); }
 
-        /* ══════════ TÍTULO DE PÁGINA ══════════ */
-        .erp-page-title {
-            display: flex; align-items: center; gap: 1rem;
-            margin-bottom: 1.75rem; padding-bottom: .75rem;
-            border-bottom: 3px dashed var(--clr-border);
-        }
-        /* Óvalo amarillo con estrella, guiño al arte de referencia */
-        .erp-page-title::before {
-            content: ""; flex-shrink: 0; width: 38px; height: 48px;
-            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 48'><ellipse cx='19' cy='24' rx='16' ry='21' fill='%23F2D21B' stroke='%23140C07' stroke-width='2.5'/><path transform='translate(19 25) scale(1.5)' fill='%23140C07' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/></svg>") center / contain no-repeat;
-        }
-        .erp-page-title h2 {
-            font-family: 'Chewy','Nunito',cursive; font-weight: 400;
-            font-size: 2.4rem; line-height: 1.1; letter-spacing: .02em;
-            color: var(--clr-title); margin: 0;
-        }
-        [data-theme="dark"] .erp-page-title h2 { text-shadow: 2px 2px 0 var(--clr-ink); }
+        code,.mono { font-family:'Special Elite',monospace; font-size:.88em; color:var(--clr-code); background:rgba(14,8,5,.3); padding:.1em .4em; border-radius:4px; }
 
-        /* ══════════ CÓDIGO ══════════ */
-        code, .mono {
-            font-family: 'JetBrains Mono',Consolas,monospace;
-            font-size: .85em; color: var(--clr-code);
-            background: rgba(20,12,7,.28); padding: .1em .4em; border-radius: 6px;
-        }
+        /* ══════════ PISO DE MADERA + FOOTER ══════════ */
+        .erp-footer { position:relative; z-index:3; color:rgba(241,228,200,.8); text-align:center; font-family:'Special Elite',monospace;
+            font-size:.85rem; padding:.9rem; border-top:4px solid var(--clr-royal);
+            background:repeating-linear-gradient(90deg,rgba(0,0,0,.25) 0 2px,transparent 2px 70px),var(--clr-navy); }
 
-        /* ══════════ FOOTER ══════════ */
-        .erp-footer {
-            position: relative; z-index: 3;
-            background: var(--clr-navy); color: rgba(248,235,196,.75);
-            text-align: center; font-size: .82rem; font-weight: 600;
-            padding: .8rem; border-top: 4px solid var(--clr-royal);
-        }
-
-        /* ══════════ BARRIO: casas con niños pidiendo dulces (fondo fijo) ══════════ */
-        :root { --ch: clamp(120px, 13vw, 180px); --foot: 52px; }
-        .barrio {
-            position: fixed; left: 0; right: 0; bottom: var(--foot);
-            height: var(--ch); overflow: hidden;
-            z-index: 0; pointer-events: none;
-        }
-        .barrio svg {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            height: var(--ch); width: calc(var(--ch) * 7.7778);
-        }
-        .ninio { animation: salta 1.8s ease-in-out infinite; }
-        @keyframes salta {
-            0%, 100% { transform: translateY(0); }
-            40%, 60% { transform: translateY(-5px); }
-        }
-        .burbuja { opacity: 0; animation: burbuja 9s ease-in-out infinite; }
-        @keyframes burbuja {
-            0%, 4%   { opacity: 0; }
-            10%, 34% { opacity: 1; }
-            40%, 100% { opacity: 0; }
-        }
-
-        /* ══════════ CALABAZAS VOLANDO AL HACER CLIC EN UNA CAJITA ══════════ */
-        .calabaza-vuela {
-            position: fixed; z-index: 10000; pointer-events: none;
-            line-height: 1;
-            animation: calabaza-vuela .95s cubic-bezier(.2,.7,.4,1) forwards;
-        }
-        @keyframes calabaza-vuela {
-            0%   { opacity: 0; transform: translate(-50%, -50%) scale(.3) rotate(0deg); }
-            12%  { opacity: 1; }
-            55%  { opacity: 1; transform: translate(calc(-50% + var(--dx) * .7), calc(-50% + var(--dy))) scale(1.1) rotate(calc(var(--rot) * .6)); }
-            100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 150px)) scale(.9) rotate(var(--rot)); }
-        }
-
-        /* ══════════ CALABAZAS AL TECLEAR ══════════ */
-        .calabaza-tecla {
-            position: fixed; z-index: 10000; pointer-events: none;
-            font-size: 1.6rem; line-height: 1;
-            animation: calabaza-sube 1s ease-out forwards;
-        }
-        @keyframes calabaza-sube {
-            0%   { opacity: 0; transform: translate(-50%, 0) scale(.4) rotate(0deg); }
-            15%  { opacity: 1; transform: translate(-50%, -10px) scale(1.2) rotate(-8deg); }
-            100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), -70px) scale(.9) rotate(var(--rot)); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .calabaza-tecla, .calabaza-vuela { display: none; }
-            .ninio { animation: none; }
-            .burbuja { display: none; }
-            .leaf, .leaf-zone { display: none; }
-            * { transition: none !important; }
-        }
-        @media (max-width: 576px) {
-            .erp-page-title h2 { font-size: 1.8rem; }
-            .erp-page-title::before { width: 28px; height: 36px; }
-        }
+        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco { animation:none; } * { transition:none !important; } }
+        @media (max-width:576px) { .erp-page-title h2 { font-size:1.7rem; } }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
 
-<!-- Árbol reutilizable (dos copias: izquierda y derecha) -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <defs>
-        <symbol id="arbol" viewBox="0 0 220 420">
-            <g stroke="#140C07" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-                <path d="M96 262 C70 246 55 226 48 200" fill="none" stroke-width="13"/>
-                <path d="M96 262 C70 246 55 226 48 200" fill="none" stroke="#6B3F1D" stroke-width="7"/>
-                <path d="M124 252 C150 236 165 216 172 190" fill="none" stroke-width="13"/>
-                <path d="M124 252 C150 236 165 216 172 190" fill="none" stroke="#6B3F1D" stroke-width="7"/>
-                <path d="M98 420 C102 340 98 280 93 215 L127 215 C122 280 120 340 126 420 Z" fill="#6B3F1D"/>
-                <ellipse cx="111" cy="335" rx="10" ry="15" fill="#140C07"/>
-                <circle cx="110" cy="92" r="70" fill="#E8731F"/>
-                <circle cx="52" cy="132" r="50" fill="#F2B91B"/>
-                <circle cx="168" cy="128" r="52" fill="#B8431A"/>
-                <circle cx="108" cy="148" r="50" fill="#E8731F"/>
-                <circle cx="68" cy="68" r="36" fill="#F2B91B"/>
-                <circle cx="152" cy="64" r="38" fill="#E8731F"/>
-                <ellipse cx="170" cy="402" rx="24" ry="17" fill="#E8731F"/>
-                <path d="M170 386 C168 380 172 376 177 376" fill="none" stroke="#3F7A2A" stroke-width="4"/>
-            </g>
-            <g fill="#F8EBC4" stroke="#140C07" stroke-width="1.6" stroke-linejoin="round">
-                <path transform="translate(100 60) rotate(10)" d="M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z"/>
-                <path transform="translate(55 140) rotate(-15) scale(.8)" d="M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z"/>
-                <path transform="translate(168 135) rotate(20) scale(.9)" d="M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z"/>
-            </g>
-        </symbol>
-    </defs>
-</svg>
-
-<!-- Barrio: casas con niños disfrazados pidiendo dulces -->
-<div class="barrio" aria-hidden="true">
-<svg viewBox="0 0 1400 180" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-        <!-- Calabaza de porche -->
-        <g id="calab" stroke="#140C07" stroke-linejoin="round" stroke-linecap="round">
-            <ellipse cx="0" cy="-8" rx="11" ry="9" fill="#E8731F" stroke-width="2.5"/>
-            <path d="M0 -17 Q1 -22 5 -23" fill="none" stroke="#3F7A2A" stroke-width="3"/>
-            <path d="M-6 -11 l3 -4 l3 4z M3 -11 l3 -4 l3 4z" fill="#140C07" stroke-width="1"/>
-            <path d="M-5 -4 Q0 0 5 -4" fill="none" stroke-width="2"/>
-        </g>
-
-        <!-- Casa grande (el color del cuerpo llega con --c) -->
-        <g id="casa" stroke="#140C07" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-            <rect x="108" y="-140" width="18" height="40" fill="#B8431A"/>
-            <rect x="0" y="-90" width="150" height="90" style="fill:var(--c)"/>
-            <path d="M-10 -90 L75 -148 L160 -90Z" fill="#8A4B24"/>
-            <circle cx="75" cy="-113" r="9" fill="#FFE45C"/>
-            <rect x="20" y="-72" width="34" height="32" fill="#FFE45C"/>
-            <rect x="96" y="-72" width="34" height="32" fill="#FFE45C"/>
-            <path d="M37 -72V-40M20 -56H54M113 -72V-40M96 -56H130" fill="none" stroke-width="2"/>
-            <path d="M60 0V-38A15 15 0 0 1 90 -38V0Z" fill="#2A180D"/>
-            <circle cx="84" cy="-22" r="2.5" fill="#FFE45C" stroke-width="1"/>
-        </g>
-
-        <!-- Casita -->
-        <g id="casita" stroke="#140C07" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-            <rect x="0" y="-80" width="110" height="80" style="fill:var(--c)"/>
-            <path d="M-8 -80 L55 -130 L118 -80Z" fill="#8A4B24"/>
-            <rect x="14" y="-62" width="30" height="28" fill="#FFE45C"/>
-            <path d="M29 -62V-34M14 -48H44" fill="none" stroke-width="2"/>
-            <path d="M62 0V-34A13 13 0 0 1 88 -34V0Z" fill="#2A180D"/>
-            <circle cx="82" cy="-20" r="2.5" fill="#FFE45C" stroke-width="1"/>
-        </g>
-
-        <!-- Niño fantasma -->
-        <g id="k-fantasma" stroke="#140C07" stroke-linejoin="round" stroke-linecap="round">
-            <path d="M-14 0V-28C-14 -50 14 -50 14 -28V0L8 -6L2 0L-4 -6L-10 0Z" fill="#F8EBC4" stroke-width="2.5"/>
-            <circle cx="-5" cy="-30" r="2.6" fill="#140C07" stroke="none"/>
-            <circle cx="5" cy="-30" r="2.6" fill="#140C07" stroke="none"/>
-            <ellipse cx="0" cy="-22" rx="3" ry="4" fill="#140C07" stroke="none"/>
-            <path d="M13 -22Q19 -34 25 -22" fill="none" stroke-width="2"/>
-            <path d="M12 -22H26L24 -9H14Z" fill="#E8731F" stroke-width="2"/>
-        </g>
-
-        <!-- Niña bruja -->
-        <g id="k-bruja" stroke="#140C07" stroke-linejoin="round" stroke-linecap="round">
-            <path d="M0 -32L-14 0H14Z" fill="#140C07" stroke="#F8EBC4" stroke-width="1.5"/>
-            <circle cx="0" cy="-38" r="7" fill="#F5C99B" stroke-width="2"/>
-            <path d="M-8 -43L0 -64L8 -43Z" fill="#140C07" stroke="#F8EBC4" stroke-width="1.5"/>
-            <ellipse cx="0" cy="-43" rx="12" ry="3" fill="#140C07" stroke="#F8EBC4" stroke-width="1.5"/>
-            <path d="M-8 -45H8" fill="none" stroke="#E8731F" stroke-width="2.5"/>
-            <circle cx="-2.5" cy="-38" r="1.2" fill="#140C07" stroke="none"/>
-            <circle cx="2.5" cy="-38" r="1.2" fill="#140C07" stroke="none"/>
-            <path d="M10 -20Q16 -32 22 -20" fill="none" stroke-width="2"/>
-            <path d="M9 -20H23L21 -7H11Z" fill="#E8731F" stroke-width="2"/>
-        </g>
-
-        <!-- Niño calabaza -->
-        <g id="k-calabaza" stroke="#140C07" stroke-linejoin="round" stroke-linecap="round">
-            <ellipse cx="0" cy="-22" rx="16" ry="18" fill="#E8731F" stroke-width="2.5"/>
-            <path d="M0 -40Q1 -46 6 -48" fill="none" stroke="#3F7A2A" stroke-width="3.5"/>
-            <path d="M-9 -28l3 -5l3 5zM3 -28l3 -5l3 5z" fill="#140C07" stroke-width="1"/>
-            <path d="M-8 -17Q0 -9 8 -17" fill="none" stroke-width="2.2"/>
-            <path d="M-6 -4V0M6 -4V0" stroke-width="3"/>
-            <path d="M15 -20Q21 -32 27 -20" fill="none" stroke-width="2"/>
-            <path d="M14 -20H28L26 -7H16Z" fill="#FFE45C" stroke-width="2"/>
-        </g>
-    </defs>
-
-    <!-- Acera -->
-    <rect x="0" y="158" width="1400" height="22" fill="#2A180D" stroke="#140C07" stroke-width="3"/>
-    <path d="M0 170H1400" stroke="#F8EBC4" stroke-width="2" stroke-dasharray="16 12" opacity=".45"/>
-
-    <!-- Casas -->
-    <use href="#casa"   transform="translate(40 158)"   style="--c:#B8431A"/>
-    <use href="#casita" transform="translate(250 158)"  style="--c:#E8731F"/>
-    <use href="#casa"   transform="translate(430 158)"  style="--c:#D9A441"/>
-    <use href="#casita" transform="translate(640 158)"  style="--c:#B8431A"/>
-    <use href="#casa"   transform="translate(820 158)"  style="--c:#E8731F"/>
-    <use href="#casita" transform="translate(1030 158)" style="--c:#D9A441"/>
-    <use href="#casa"   transform="translate(1210 158)" style="--c:#B8431A"/>
-
-    <!-- Calabazas de porche -->
-    <use href="#calab" transform="translate(56 158)"/>
-    <use href="#calab" transform="translate(264 158)"/>
-    <use href="#calab" transform="translate(446 158)"/>
-    <use href="#calab" transform="translate(836 158)"/>
-    <use href="#calab" transform="translate(1044 158)"/>
-    <use href="#calab" transform="translate(1226 158)"/>
-
-    <!-- Niños tocando las puertas -->
-    <g transform="translate(115 158)"><use href="#k-fantasma" class="ninio" style="animation-delay:-.2s"/></g>
-    <g transform="translate(325 158)"><use href="#k-bruja"    class="ninio" style="animation-delay:-.9s"/></g>
-    <g transform="translate(505 158)"><use href="#k-calabaza" class="ninio" style="animation-delay:-.5s"/></g>
-    <g transform="translate(540 158)"><use href="#k-fantasma" class="ninio" style="animation-delay:-1.2s"/></g>
-    <g transform="translate(715 158)"><use href="#k-bruja"    class="ninio" style="animation-delay:-.4s"/></g>
-    <g transform="translate(895 158)"><use href="#k-calabaza" class="ninio" style="animation-delay:-1.4s"/></g>
-    <g transform="translate(930 158)"><use href="#k-bruja"    class="ninio" style="animation-delay:-.7s"/></g>
-    <g transform="translate(1105 158)"><use href="#k-fantasma" class="ninio" style="animation-delay:-1s"/></g>
-    <g transform="translate(1285 158)"><use href="#k-bruja"   class="ninio" style="animation-delay:-.3s"/></g>
-
-    <!-- Globos de diálogo (aparecen de vez en cuando) -->
-    <g class="burbuja" transform="translate(115 0)" style="animation-delay:0s">
-        <path d="M-8 93L0 106L8 93Z" fill="#F8EBC4" stroke="#140C07" stroke-width="2.5" stroke-linejoin="round"/>
-        <rect x="-64" y="64" width="128" height="30" rx="15" fill="#F8EBC4" stroke="#140C07" stroke-width="2.5"/>
-        <text x="0" y="85" text-anchor="middle" font-family="Chewy, Nunito, cursive" font-size="16" fill="#140C07">¡Dulce o truco!</text>
-    </g>
-    <g class="burbuja" transform="translate(895 0)" style="animation-delay:-4.5s">
-        <path d="M-8 93L0 106L8 93Z" fill="#F8EBC4" stroke="#140C07" stroke-width="2.5" stroke-linejoin="round"/>
-        <rect x="-64" y="64" width="128" height="30" rx="15" fill="#F8EBC4" stroke="#140C07" stroke-width="2.5"/>
-        <text x="0" y="85" text-anchor="middle" font-family="Chewy, Nunito, cursive" font-size="16" fill="#140C07">¡Dulce o truco!</text>
-    </g>
-</svg>
-</div>
-
-<svg class="tree tree-l" viewBox="0 0 220 420" aria-hidden="true"><use href="#arbol"/></svg>
-<svg class="tree tree-r" viewBox="0 0 220 420" aria-hidden="true"><use href="#arbol"/></svg>
-<div class="leaf-zone l" id="hojasIzq" aria-hidden="true"></div>
-<div class="leaf-zone r" id="hojasDer" aria-hidden="true"></div>
-
-<!-- NAVBAR -->
 <nav class="erp-navbar">
-    <a class="erp-brand" href="/">🎃 ERP Django <span>· UTEC Celaya</span></a>
+    <a class="erp-brand" href="/"><span class="mini-disco" aria-hidden="true"></span>
+        <span>Gio's Wax Cellar <small>· el sótano del vinilo</small></span></a>
     <div class="erp-nav-links">
         {# Reportes: prueba varios nombres de ruta sin romper la página #}
         {% url 'reportes:inicio' as rep_inicio %}
@@ -523,21 +159,14 @@
         {% url 'reportes:dashboard' as rep_dash %}
         {% url 'reportes:index' as rep_index %}
 
-        <a href="{% url 'productos:lista' %}"
-           class="erp-nav-link {% block nav_productos %}{% endblock %}">Productos</a>
-        <a href="{% url 'clientes:lista' %}"
-           class="erp-nav-link {% block nav_clientes %}{% endblock %}">Clientes</a>
-        <a href="{% url 'proveedores:lista' %}"
-           class="erp-nav-link {% block nav_proveedores %}{% endblock %}">Proveedores</a>
-        <a href="{% url 'ventas:lista' %}"
-           class="erp-nav-link {% block nav_ventas %}{% endblock %}">Ventas</a>
-        <a href="{{ rep_inicio|default:rep_lista|default:rep_dash|default:rep_index|default:'#' }}"
-           class="erp-nav-link {% block nav_reportes %}{% endblock %}">Reportes</a>
+        <a href="{% url 'productos:lista' %}" class="erp-nav-link {% block nav_productos %}{% endblock %}">Productos</a>
+        <a href="{% url 'clientes:lista' %}" class="erp-nav-link {% block nav_clientes %}{% endblock %}">Clientes</a>
+        <a href="{% url 'proveedores:lista' %}" class="erp-nav-link {% block nav_proveedores %}{% endblock %}">Proveedores</a>
+        <a href="{% url 'ventas:lista' %}" class="erp-nav-link {% block nav_ventas %}{% endblock %}">Ventas</a>
+        <a href="{{ rep_inicio|default:rep_lista|default:rep_dash|default:rep_index|default:'#' }}" class="erp-nav-link {% block nav_reportes %}{% endblock %}">Reportes</a>
         <a href="/admin/" class="erp-nav-link">Admin</a>
         {% if user.is_authenticated %}
-            <a href="/accounts/logout/" class="erp-nav-link">
-                Salir ({{ user.username }})
-            </a>
+            <a href="/accounts/logout/" class="erp-nav-link">Salir ({{ user.username }})</a>
         {% else %}
             <a href="/accounts/login/" class="erp-nav-link">Entrar</a>
         {% endif %}
@@ -545,146 +174,64 @@
     </div>
 </nav>
 
-<!-- MENSAJES FLASH -->
+<div class="focos" id="focos" aria-hidden="true"></div>
+
 {% if messages %}
 <div class="container mt-4" style="position:relative;z-index:1;">
     {% for m in messages %}
-    <div class="erp-alert-{% if m.tags == 'error' %}danger{% elif m.tags == 'success' %}success{% else %}info{% endif %} d-flex justify-content-between align-items-center mb-2"
-         role="alert">
+    <div class="erp-alert-{% if m.tags == 'error' %}danger{% elif m.tags == 'success' %}success{% else %}info{% endif %} d-flex justify-content-between align-items-center mb-2" role="alert">
         <span>{{ m }}</span>
-        <button onclick="this.parentElement.style.display='none'"
-                aria-label="Cerrar"
+        <button onclick="this.parentElement.style.display='none'" aria-label="Cerrar"
                 style="background:none;border:none;cursor:pointer;font-size:1.2rem;font-weight:800;color:inherit;">×</button>
     </div>
     {% endfor %}
 </div>
 {% endif %}
 
-<!-- CONTENIDO PRINCIPAL -->
 <main class="erp-main">
     <div class="container">
         {% block content %}{% endblock %}
     </div>
 </main>
 
-<!-- FOOTER -->
 <footer class="erp-footer">
-    🎃 ERP Django · Django 4.2 LTS · Halloween Edition · UTEC Celaya · Espiral 1
+    Gio's Wax Cellar · ERP Django 4.2 LTS · UTEC Celaya · Espiral 1 · Hecho por Gio
 </footer>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Hojitas de otoño cayendo de los dos árboles -->
+<!-- Focos colgantes -->
 <script>
 (function () {
-    function soltarHojas(zona, direccion, cantidad) {
-        if (!zona) return;
-        for (var i = 0; i < cantidad; i++) {
-            var h = document.createElement('span');
-            var size = 14 + Math.random() * 10;
-            h.className = 'leaf c' + (i % 3);
-            h.style.setProperty('--t', (6 + Math.random() * 36).toFixed(1));
-            h.style.setProperty('--dx', (direccion * (20 + Math.random() * 110)).toFixed(0) + 'px');
-            h.style.setProperty('--rot', (direccion * (120 + Math.random() * 480)).toFixed(0) + 'deg');
-            h.style.left = (6 + Math.random() * 78).toFixed(1) + '%';
-            h.style.width = size + 'px';
-            h.style.height = (size * 1.08) + 'px';
-            h.style.animationDuration = (7 + Math.random() * 6).toFixed(1) + 's';
-            h.style.animationDelay = (-Math.random() * 12).toFixed(1) + 's';
-            zona.appendChild(h);
-        }
+    var cont = document.getElementById('focos');
+    if (!cont) return;
+    var n = Math.max(4, Math.round(window.innerWidth / 190));
+    for (var i = 0; i < n; i++) {
+        var f = document.createElement('span');
+        f.className = 'foco';
+        f.style.left = ((i + .5) * 100 / n + (Math.random() * 4 - 2)).toFixed(1) + '%';
+        f.style.height = (28 + Math.random() * 46).toFixed(0) + 'px';
+        f.style.animationDelay = (-Math.random() * 6).toFixed(1) + 's';
+        cont.appendChild(f);
     }
-    soltarHojas(document.getElementById('hojasIzq'),  1, 10);
-    soltarHojas(document.getElementById('hojasDer'), -1, 10);
 })();
 </script>
 
-<!-- Calabazas que salen volando al hacer clic en una cajita (.erp-card) -->
+<!-- Modo día/noche -->
 <script>
 (function () {
-    var reducido = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    // Disponible para cualquier plantilla: lanzarCalabazas(x, y, cantidad)
-    window.lanzarCalabazas = function (x, y, n) {
-        if (reducido.matches) return;
-        if (document.querySelectorAll('.calabaza-vuela').length > 40) return;
-        for (var i = 0; i < (n || 8); i++) {
-            var c = document.createElement('span');
-            c.className = 'calabaza-vuela';
-            c.textContent = '🎃';
-            c.style.left = x + 'px';
-            c.style.top  = y + 'px';
-            c.style.fontSize = (1.2 + Math.random() * 0.9).toFixed(2) + 'rem';
-            c.style.animationDelay = (Math.random() * 0.12).toFixed(2) + 's';
-            c.style.setProperty('--dx',  ((Math.random() * 2 - 1) * 150).toFixed(0) + 'px');
-            c.style.setProperty('--dy',  (-(60 + Math.random() * 120)).toFixed(0) + 'px');
-            c.style.setProperty('--rot', ((Math.random() * 2 - 1) * 200).toFixed(0) + 'deg');
-            c.addEventListener('animationend', function () { this.remove(); });
-            document.body.appendChild(c);
-        }
-    };
-
-    // Clic en el fondo de cualquier cajita (si no es enlace, botón ni campo)
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('.erp-card')) return;
-        if (e.target.closest('a, button, input, select, textarea, label')) return;
-        window.lanzarCalabazas(e.clientX, e.clientY, 8);
-    });
-})();
-</script>
-
-<!-- Una calabaza por cada tecla -->
-<script>
-(function () {
-    var ignoradas = ['Shift','Control','Alt','Meta','CapsLock','Tab','Escape'];
-    var reducido = window.matchMedia('(prefers-reduced-motion: reduce)');
-    document.addEventListener('keydown', function (e) {
-        if (reducido.matches || e.ctrlKey || e.metaKey || e.altKey) return;
-        if (ignoradas.indexOf(e.key) !== -1) return;
-        if (document.querySelectorAll('.calabaza-tecla').length > 25) return;
-
-        var el = document.activeElement, x, y;
-        if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
-            var r = el.getBoundingClientRect();      // sale justo encima del campo
-            x = r.left + 12 + Math.random() * Math.max(r.width - 24, 1);
-            y = r.top - 4;
-        } else {                                      // si no hay campo, aparece al azar
-            x = window.innerWidth * (0.1 + Math.random() * 0.8);
-            y = window.innerHeight * (0.65 + Math.random() * 0.25);
-        }
-        var c = document.createElement('span');
-        c.className = 'calabaza-tecla';
-        c.textContent = '🎃';
-        c.style.left = x + 'px';
-        c.style.top  = y + 'px';
-        c.style.setProperty('--dx',  ((Math.random() * 60) - 30).toFixed(0) + 'px');
-        c.style.setProperty('--rot', ((Math.random() * 60) - 30).toFixed(0) + 'deg');
-        c.addEventListener('animationend', function () { c.remove(); });
-        document.body.appendChild(c);
-    });
-})();
-</script>
-
-<!-- Toggle modo día/noche (noche = chocolate con estrellitas, por defecto) -->
-<script>
-(function () {
-    var btn  = document.getElementById('themeBtn');
-    var html = document.documentElement;
-    var icons = { dark: '☀️', light: '🌙' };
-    var saved = 'dark';
+    var btn = document.getElementById('themeBtn'), html = document.documentElement;
+    var icons = { dark: '☀️', light: '🌙' }, saved = 'dark';
     try { saved = localStorage.getItem('erpTheme') || 'dark'; } catch (e) {}
     html.setAttribute('data-theme', saved);
-    if (btn) btn.textContent = icons[saved];
-    if (btn) {
-        btn.addEventListener('click', function () {
-            var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', next);
-            btn.textContent = icons[next];
-            try { localStorage.setItem('erpTheme', next); } catch (e) {}
-        });
-    }
+    if (!btn) return;
+    btn.textContent = icons[saved];
+    btn.addEventListener('click', function () {
+        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        btn.textContent = icons[next];
+        try { localStorage.setItem('erpTheme', next); } catch (e) {}
+    });
 })();
 </script>
 {% block extra_js %}{% endblock %}

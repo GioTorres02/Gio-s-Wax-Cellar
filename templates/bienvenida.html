@@ -3,105 +3,99 @@
 
 {% block extra_css %}
 <style>
-    /* ── HERO: óvalo amarillo con estrellas negras, como la ilustración ── */
-    .hero-ovalo {
-        width: 132px; height: 168px; margin: 0 auto 1rem;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 3.6rem; line-height: 1;
-        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 190'><ellipse cx='75' cy='95' rx='70' ry='90' fill='%23F2D21B' stroke='%23140C07' stroke-width='4'/><g fill='%23140C07'><path transform='translate(32 62) rotate(-10) scale(1.7)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(118 44) rotate(15) scale(1.9)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(76 24) rotate(5) scale(1.1)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(124 118) rotate(-8) scale(1.5)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/><path transform='translate(24 138) rotate(12) scale(1.3)' d='M0 -9 L2.2 -3.1 L8.6 -2.8 L3.6 1.2 L5.3 7.3 L0 3.8 L-5.3 7.3 L-3.6 1.2 L-8.6 -2.8 L-2.2 -3.1Z'/></g></svg>") center / contain no-repeat;
-        filter: drop-shadow(4px 4px 0 var(--clr-ink));
-        padding-top: 1.4rem;
-    }
-    .hero-titulo {
-        font-family: 'Chewy','Nunito',cursive; font-weight: 400;
-        font-size: clamp(2.4rem, 6vw, 3.6rem); line-height: 1.05;
-        letter-spacing: .02em; margin: 0;
-        color: var(--clr-title);
-    }
-    [data-theme="dark"] .hero-titulo { text-shadow: 3px 3px 0 var(--clr-ink); }
-    .hero-sub { color: var(--clr-muted); font-size: 1.05rem; font-weight: 600; margin: .5rem 0 0; }
+    .letrero { text-align:center; padding:.5rem 0 1.5rem; }
+    .letrero h1 { font-family:'Bevan',serif; font-weight:400; margin:0; line-height:1;
+        font-size:clamp(2.6rem,7vw,4.4rem); color:var(--clr-title); }
+    [data-theme="dark"] .letrero h1 { text-shadow:3px 3px 0 var(--clr-ink), 0 0 28px rgba(255,179,71,.45); }
+    .letrero .apodo { font-family:'Special Elite',monospace; font-size:1.15rem; color:var(--clr-text); margin:.5rem 0 0; }
+    .letrero .sub { color:var(--clr-muted); font-weight:600; margin:.3rem 0 0; }
 
-    /* ── MÓDULOS: stickers ligeramente chuecos ── */
-    .modulo-link { display: block; color: inherit; text-decoration: none; height: 100%; }
-    .modulo-link .erp-card {
-        height: 100%; margin-bottom: 0; text-align: center;
-        transition: transform .15s, box-shadow .15s;
-    }
-    .col-md-4:nth-child(odd)  .erp-card { transform: rotate(-1.2deg); }
-    .col-md-4:nth-child(even) .erp-card { transform: rotate(1.2deg); }
-    .modulo-link:hover .erp-card,
-    .modulo-link:focus-visible .erp-card {
-        transform: rotate(0) translate(-2px,-3px);
-        box-shadow: 8px 8px 0 var(--clr-ink);
-    }
-    .modulo-icono {
-        width: 64px; height: 80px; margin: 0 auto .6rem;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.9rem;
-        background: var(--clr-sky);
-        border: 3px solid var(--clr-ink); border-radius: 50%;
-    }
-    .modulo-nombre {
-        display: block;
-        font-family: 'Chewy','Nunito',cursive; font-weight: 400;
-        font-size: 1.4rem; letter-spacing: .02em;
-        color: var(--clr-text);
-    }
-    .modulo-desc { color: var(--clr-muted); font-size: .88rem; margin: .3rem 0 0; }
+    /* ── Tocadiscos: "sonando ahora" ── */
+    .sonando-ahora { max-width:520px; margin:1.2rem auto 0; padding:.55rem 1rem; display:flex; align-items:center; gap:.8rem;
+        background:var(--clr-navy); color:#F1E4C8; border:3px solid var(--clr-ink); border-radius:6px; box-shadow:var(--shadow-sm);
+        font-family:'Special Elite',monospace; }
+    .sonando-ahora .led { width:10px; height:10px; border-radius:50%; background:#555; flex-shrink:0; }
+    .sonando-ahora.on .led { background:#FFB347; box-shadow:0 0 10px 3px rgba(255,179,71,.8); }
+    .sonando-ahora button { margin-left:auto; background:var(--clr-royal); border:2px solid var(--clr-ink); border-radius:4px;
+        font-weight:700; padding:.1rem .7rem; color:var(--clr-ink); display:none; }
+    .sonando-ahora.on button { display:block; }
 
-    /* ── BRUJAS EN ESCOBA cruzando la pantalla ── */
-    .bruja {
-        position: fixed; left: 0; top: var(--y);
-        width: 120px; height: 70px; z-index: 2; pointer-events: none;
-        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 70'><path d='M10 50 L108 44' stroke='%236B3F1D' stroke-width='4' stroke-linecap='round'/><path d='M26 49 L4 38 L7 51 L2 60 L12 56 L26 53Z' fill='%23E8731F' stroke='%23140C07' stroke-width='2' stroke-linejoin='round'/><path d='M66 36 L88 43' stroke='%23F8EBC4' stroke-width='5' stroke-linecap='round'/><path d='M66 36 L88 43' stroke='%23140C07' stroke-width='3' stroke-linecap='round'/><path d='M48 47 C48 34 60 28 68 33 L76 47Z' fill='%23140C07' stroke='%23F8EBC4' stroke-width='1.5' stroke-linejoin='round'/><circle cx='70' cy='24' r='6.5' fill='%23F5C99B' stroke='%23140C07' stroke-width='2'/><path d='M63 19 L76 2 L79 19Z' fill='%23140C07' stroke='%23F8EBC4' stroke-width='1.5' stroke-linejoin='round'/><ellipse cx='71' cy='19' rx='11' ry='3' fill='%23140C07' stroke='%23F8EBC4' stroke-width='1.5'/><path d='M64 16 L78 16' stroke='%23E8731F' stroke-width='2.5'/><path d='M62 46 L58 58 L64 58' fill='none' stroke='%23F8EBC4' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><path d='M62 46 L58 58 L64 58' fill='none' stroke='%23140C07' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
-        animation: var(--anim) var(--dur) linear var(--delay) infinite;
-    }
-    @keyframes bruja-der {
-        0%   { transform: translate(-180px, 0); }
-        25%  { transform: translate(calc(25vw - 45px), -22px) rotate(-3deg); }
-        50%  { transform: translate(calc(50vw - 90px), 10px) rotate(2deg); }
-        75%  { transform: translate(calc(75vw - 135px), -18px) rotate(-3deg); }
-        100% { transform: translate(calc(100vw + 60px), 0); }
-    }
-    @keyframes bruja-izq {
-        0%   { transform: translate(calc(100vw + 60px), 0) scaleX(-1); }
-        25%  { transform: translate(calc(75vw - 45px), -20px) scaleX(-1) rotate(-3deg); }
-        50%  { transform: translate(calc(50vw - 90px), 12px) scaleX(-1) rotate(2deg); }
-        75%  { transform: translate(calc(25vw - 135px), -16px) scaleX(-1) rotate(-3deg); }
-        100% { transform: translate(-180px, 0) scaleX(-1); }
-    }
+    /* ── Caja de discos ── */
+    .caja { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:2.2rem 1.5rem; margin-top:1.5rem; }
+    .vinilo { position:relative; }
+    .vinilo-stage { position:relative; width:70%; aspect-ratio:1; margin:0 auto 0 0; }
 
-    @media (prefers-reduced-motion: reduce) {
-        .col-md-4 .erp-card { transform: none !important; }
-        .bruja { display: none; }
-    }
+    /* El disco: surcos + etiqueta central */
+    .disco { position:absolute; inset:0; border-radius:50%; z-index:1; border:2px solid #000;
+        box-shadow:3px 3px 0 var(--clr-ink); transition:transform .8s cubic-bezier(.3,.9,.3,1); }
+    .disco-giro { width:100%; height:100%; border-radius:50%;
+        background:
+            radial-gradient(circle,#0b0b0b 0 3%,transparent 3.5%),
+            radial-gradient(circle,var(--a) 0 30%,#000 31% 33%,transparent 34%),
+            conic-gradient(from 20deg,rgba(255,255,255,.14),transparent 12%,transparent 45%,rgba(255,255,255,.12) 55%,transparent 68%,transparent 95%,rgba(255,255,255,.14)),
+            repeating-radial-gradient(circle,#141414 0 2px,#252525 3px 4px); }
+    .disco-giro span { display:flex; width:100%; height:100%; align-items:center; justify-content:center; text-align:center;
+        font-family:'Special Elite',monospace; font-size:.62rem; line-height:1.1; color:#140C07; padding:32%; word-break:break-word; }
+    .vinilo.sonando .disco { transform:translateX(42%); }
+    .vinilo.sonando .disco-giro { animation:gira 2.4s linear infinite; }
+
+    /* La funda: portada de cartón */
+    .funda { position:relative; z-index:2; width:100%; height:100%; border:3px solid var(--clr-ink); border-radius:3px;
+        box-shadow:var(--shadow-md); cursor:pointer; padding:0; overflow:hidden; display:block; text-align:left;
+        background:
+            radial-gradient(circle at 78% 24%,var(--b) 0 17%,transparent 18%),
+            linear-gradient(160deg,var(--a),var(--c));
+        transition:transform .25s,box-shadow .25s; }
+    .funda::after { content:""; position:absolute; inset:0; pointer-events:none;
+        background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 2px,transparent 2px 5px); }
+    .funda:hover { transform:translate(-3px,-3px) rotate(-1deg); box-shadow:9px 9px 0 var(--clr-ink); }
+    .vinilo.sonando .funda { transform:translateX(-6%); }
+    .funda-icono { position:absolute; right:14%; top:13%; font-size:2rem; }
+    .funda-artista { position:absolute; left:8%; right:8%; bottom:26%; font-family:'Bevan',serif; font-size:1.55rem; line-height:1.02; color:#FFF6DC; text-shadow:2px 2px 0 rgba(0,0,0,.55); }
+    .funda-disco { position:absolute; left:8%; right:8%; bottom:12%; font-family:'Special Elite',monospace; font-size:.85rem; color:#FFF6DC; opacity:.9; }
+
+    /* Etiqueta de precio con el módulo */
+    .etiqueta { margin-top:1rem; padding:.55rem .8rem; background:#F1E4C8; color:#2A1A10; border:2px solid var(--clr-ink);
+        border-radius:3px; box-shadow:3px 3px 0 var(--clr-ink); font-family:'Special Elite',monospace; transform:rotate(-.8deg); }
+    .vinilo:nth-child(even) .etiqueta { transform:rotate(.8deg); }
+    .etiqueta strong { display:block; font-family:'Bevan',serif; font-weight:400; font-size:1.15rem; }
+    .etiqueta p { margin:.15rem 0 .45rem; font-size:.8rem; }
+    .etiqueta a { display:none; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
+        font-family:'Work Sans',sans-serif; font-weight:700; font-size:.82rem; padding:.15rem .8rem; text-decoration:none; }
+    .vinilo.sonando .etiqueta a { display:inline-block; }
+
+    @media (prefers-reduced-motion: reduce) { .vinilo.sonando .disco-giro { animation:none; } .funda:hover { transform:none; } }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="text-center py-3">
-    <div class="hero-ovalo" aria-hidden="true">🎃</div>
-    <h1 class="hero-titulo">ERP Django</h1>
-    <p class="hero-sub">
-        Sistema de gestión empresarial · UTEC Celaya · Espiral 1 W02
-    </p>
-    <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
-        <span class="badge-erp-gold">Django 4.2 LTS</span>
-        <span class="badge-erp-gold">Python 3.11</span>
-        <span class="badge-erp-gold">Halloween Edition</span>
+<div class="letrero">
+    <h1>Gio's Wax Cellar</h1>
+    <p class="apodo">«El sótano del vinilo» · discos, café y buena vibra</p>
+    <p class="sub">Sistema de gestión · UTEC Celaya · Espiral 1 W02</p>
+    <div class="sonando-ahora" id="ahora" role="status" aria-live="polite">
+        <span class="led"></span>
+        <span id="ahoraTxt">Toca una portada para sacar el disco</span>
+        <button type="button" id="ahoraStop">Pausar</button>
     </div>
 </div>
 
-<div class="row g-4 mt-2">
+<div class="caja">
     {% for m in modulos %}
-    <div class="col-md-4">
-        <a href="{{ m.url }}" class="modulo-link">
-            <div class="erp-card">
-                <div class="modulo-icono">{{ m.icono }}</div>
-                <strong class="modulo-nombre">{{ m.nombre }}</strong>
-                <p class="modulo-desc">{{ m.descripcion }}</p>
-            </div>
-        </a>
+    <div class="vinilo" data-i="{{ forloop.counter0 }}">
+        <div class="vinilo-stage">
+            <div class="disco"><div class="disco-giro"><span>{{ m.nombre }}</span></div></div>
+            <button type="button" class="funda" aria-label="Sacar el disco de {{ m.nombre }}">
+                <span class="funda-icono" aria-hidden="true">{{ m.icono }}</span>
+                <span class="funda-artista"></span>
+                <span class="funda-disco"></span>
+            </button>
+        </div>
+        <div class="etiqueta">
+            <strong>{{ m.nombre }}</strong>
+            <p>{{ m.descripcion }}</p>
+            <a href="{{ m.url }}">Entrar al módulo</a>
+        </div>
     </div>
     {% endfor %}
 </div>
@@ -110,38 +104,91 @@
 {% block extra_js %}
 <script>
 (function () {
-    var reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /* ═══════════ TUS VINILOS ═══════════
+       Edita esta lista: un vinilo por módulo, en orden (si hay más vinilos que módulos, los últimos no se muestran).
+       - artista / disco : lo que se ve en la portada.
+       - audio           : ruta a TU archivo (ponlo en static/musica/). Si el archivo
+                           no existe, suena una melodía sintetizada original.
+       - a, b, c         : colores de la portada y del centro del disco.
+       - raiz, escala, bpm: carácter de la melodía de respaldo. */
+    var VINILOS = [
+        { artista:'Sabrina Carpenter', disco:'Edición Gio #1', audio:'/static/musica/sabrina.mp3', a:'#F0B547', b:'#FFF6DC', c:'#B8431A', raiz:64, escala:[0,2,4,7,9,7,4,2],    bpm:110 },
+        { artista:'Olivia Rodrigo',    disco:'Edición Gio #2', audio:'/static/musica/olivia.mp3',  a:'#7B3FA0', b:'#F4A6D7', c:'#2A1240', raiz:60, escala:[0,2,3,7,8,7,3,2],    bpm:96 },
+        { artista:'Tate McRae',        disco:'Edición Gio #3', audio:'/static/musica/tate.mp3',    a:'#3A3A4A', b:'#E8D8C0', c:'#0E0E16', raiz:58, escala:[0,3,5,7,10,7,5,3],   bpm:100 },
+        { artista:'Adele',             disco:'Edición Gio #4', audio:'/static/musica/adele.mp3',   a:'#2F5D7A', b:'#F1E4C8', c:'#0E2233', raiz:53, escala:[0,4,7,12,11,7,4,0],  bpm:64 },
+        { artista:'KATSEYE',           disco:'Edición Gio #5', audio:'/static/musica/katseye.mp3', a:'#E83E8C', b:'#FFE45C', c:'#4A0F2E', raiz:66, escala:[0,4,7,9,12,9,7,4],   bpm:118 },
+        { artista:'Ariana Grande',     disco:'Edición Gio #6', audio:'/static/musica/ariana.mp3',  a:'#D98AA8', b:'#FFF1F5', c:'#6A2D47', raiz:62, escala:[0,4,7,11,12,11,7,4], bpm:84 },
+        { artista:'Malcolm Todd',      disco:'Edición Gio #7', audio:'/static/musica/malcolm.mp3', a:'#6B8E4E', b:'#F1E4C8', c:'#1F2E14', raiz:55, escala:[0,3,7,10,7,3,5,0],   bpm:90 }
+    ];
 
-    // Brujas en escoba: unas van hacia la derecha y otras hacia la izquierda
-    if (!reducido) {
-        var brujas = [
-            { y: '14vh', dur: 17, delay: 0,   anim: 'bruja-der' },
-            { y: '38vh', dur: 22, delay: -9,  anim: 'bruja-izq' },
-            { y: '62vh', dur: 19, delay: -4,  anim: 'bruja-der' }
-        ];
-        brujas.forEach(function (b) {
-            var el = document.createElement('div');
-            el.className = 'bruja';
-            el.setAttribute('aria-hidden', 'true');
-            el.style.setProperty('--y', b.y);
-            el.style.setProperty('--dur', b.dur + 's');
-            el.style.setProperty('--delay', b.delay + 's');
-            el.style.setProperty('--anim', b.anim);
-            document.body.appendChild(el);
-        });
+    var vinilos = document.querySelectorAll('.vinilo');
+    var ahora = document.getElementById('ahora'), txt = document.getElementById('ahoraTxt');
+    var audioEl = null, synth = null, actual = null;
+
+    /* ── Portadas ── */
+    vinilos.forEach(function (el, i) {
+        var v = VINILOS[i % VINILOS.length];
+        el.style.setProperty('--a', v.a); el.style.setProperty('--b', v.b); el.style.setProperty('--c', v.c);
+        el.querySelector('.funda-artista').textContent = v.artista;
+        el.querySelector('.funda-disco').textContent = v.disco;
+    });
+
+    /* ── Melodía de respaldo (Web Audio, original, con crujido de vinilo) ── */
+    function arrancarSynth(v) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        var ctx = new AC(), out = ctx.createGain(); out.gain.value = .35; out.connect(ctx.destination);
+        // crujido
+        var buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate), d = buf.getChannelData(0);
+        for (var k = 0; k < d.length; k++) d[k] = Math.random() < .0009 ? (Math.random() * 2 - 1) * .8 : 0;
+        var ruido = ctx.createBufferSource(); ruido.buffer = buf; ruido.loop = true;
+        var g = ctx.createGain(); g.gain.value = .5; ruido.connect(g); g.connect(out); ruido.start();
+        var paso = 0, dur = 60 / v.bpm, vivo = true;
+        function nota(semi, t, largo, tipo, vol) {
+            var o = ctx.createOscillator(), e = ctx.createGain();
+            o.type = tipo; o.frequency.value = 440 * Math.pow(2, (semi - 69) / 12);
+            e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(vol, t + .03);
+            e.gain.exponentialRampToValueAtTime(.0001, t + largo);
+            o.connect(e); e.connect(out); o.start(t); o.stop(t + largo + .05);
+        }
+        function tick() {
+            if (!vivo) return;
+            var t = ctx.currentTime + .05, s = v.escala[paso % v.escala.length];
+            nota(v.raiz + s, t, dur * 1.6, 'triangle', .35);
+            if (paso % 2 === 0) nota(v.raiz - 12 + (paso % 8 < 4 ? 0 : 5), t, dur * 1.9, 'sine', .45);
+            if (paso % 4 === 3) nota(v.raiz + 12 + s, t + dur / 2, dur, 'sine', .12);
+            paso++;
+            setTimeout(tick, dur * 1000);
+        }
+        tick();
+        return { stop: function () { vivo = false; try { ctx.close(); } catch (e) {} } };
     }
 
-    // Al hacer clic en un módulo: salen calabazas volando y luego abre la página
-    document.querySelectorAll('.modulo-link').forEach(function (a) {
-        a.addEventListener('click', function (e) {
-            if (reducido || typeof window.lanzarCalabazas !== 'function') return;
-            if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey) return;
-            e.preventDefault();
-            window.lanzarCalabazas(e.clientX, e.clientY, 10);
-            var destino = a.href;
-            setTimeout(function () { window.location.href = destino; }, 650);
+    function parar() {
+        if (audioEl) { audioEl.pause(); audioEl = null; }
+        if (synth) { synth.stop(); synth = null; }
+        vinilos.forEach(function (x) { x.classList.remove('sonando'); });
+        ahora.classList.remove('on'); txt.textContent = 'Toca una portada para sacar el disco';
+        actual = null;
+    }
+
+    function tocar(el) {
+        var v = VINILOS[+el.dataset.i % VINILOS.length];
+        parar(); actual = el;
+        el.classList.add('sonando'); ahora.classList.add('on');
+        txt.textContent = 'Sonando: ' + v.artista + ' · ' + v.disco;
+        var a = new Audio(v.audio); a.loop = true; audioEl = a;
+        a.addEventListener('error', function () { if (audioEl === a) { audioEl = null; synth = arrancarSynth(v); } });
+        a.play().catch(function () { if (audioEl === a && a.error) return; });
+    }
+
+    vinilos.forEach(function (el) {
+        el.querySelector('.funda').addEventListener('click', function () {
+            if (actual === el) parar(); else tocar(el);
         });
     });
+    document.getElementById('ahoraStop').addEventListener('click', parar);
+    window.addEventListener('pagehide', parar);
 })();
 </script>
 {% endblock %}

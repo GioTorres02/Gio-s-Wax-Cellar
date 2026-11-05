@@ -26,7 +26,6 @@ if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
 
 # ── HTTPS detrás del proxy de Render ──────────────────────────────────────
-# Render termina el TLS y reenvía a Django por HTTP con X-Forwarded-Proto.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Cookies seguras solo en producción (en local con http:// no se enviarían)
@@ -76,6 +75,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'core.urls'
 
 # ── Templates ─────────────────────────────────────────────────────────────
+# Django busca primero en C:\Temp_Workspace_ERP\templates\ (base.html, home.html)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -107,6 +107,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ── Archivos estáticos ────────────────────────────────────────────────────
+# La música de los vinilos va en  static/musica/  (sabrina.mp3, olivia.mp3, ...)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'           # destino de collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']         # fuentes adicionales
@@ -146,14 +147,14 @@ REST_FRAMEWORK = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ── JAZZMIN — Personalización del admin ───────────────────────────────────
+# ── JAZZMIN — Admin con la identidad de Gio's Wax Cellar ──────────────────
 JAZZMIN_SETTINGS = {
     # Identidad
-    'site_title': 'ERP Django',
-    'site_header': 'ERP UTEC Celaya',
-    'site_brand': '📦 ERP Django',
-    'welcome_sign': 'Bienvenido al Sistema ERP · UTEC Celaya',
-    'copyright': 'Gio Torres · UTEC Celaya',
+    'site_title': "Gio's Wax Cellar",
+    'site_header': "Gio's Wax Cellar",
+    'site_brand': "💿 Gio's Wax Cellar",
+    'welcome_sign': "Bienvenido al sótano del vinilo",
+    'copyright': "Gio Torres · Gio's Wax Cellar · UTEC Celaya",
 
     # Logo (ruta relativa a static/, agregar en W11+)
     'site_icon': None,
@@ -164,7 +165,7 @@ JAZZMIN_SETTINGS = {
 
     # Menú superior
     'topmenu_links': [
-        {'name': 'Inicio ERP', 'url': '/', 'new_window': False},
+        {'name': 'La tienda', 'url': '/', 'new_window': False},
         {'name': 'Productos', 'url': '/productos/'},
         {'name': 'Clientes', 'url': '/clientes/'},
         {'name': 'Ventas', 'url': '/ventas/'},
@@ -172,7 +173,7 @@ JAZZMIN_SETTINGS = {
 
     # Menú de usuario
     'usermenu_links': [
-        {'name': 'Ver ERP', 'url': '/', 'new_window': False},
+        {'name': 'Ver la tienda', 'url': '/', 'new_window': False},
     ],
 
     # Orden del menú lateral
@@ -189,7 +190,7 @@ JAZZMIN_SETTINGS = {
         'clientes.Cliente': 'fas fa-user-tie',
         'proveedores.Proveedor': 'fas fa-truck',
         'productos.Categoria': 'fas fa-tags',
-        'productos.Producto': 'fas fa-box',
+        'productos.Producto': 'fas fa-compact-disc',
         'ventas.Venta': 'fas fa-file-invoice-dollar',
         'ventas.DetalleVenta': 'fas fa-list',
         'ventas.Pedido': 'fas fa-shopping-cart',
@@ -217,15 +218,15 @@ JAZZMIN_UI_TWEAKS = {
     'footer_small_text': False,
     'body_small_text': False,
     'brand_small_text': False,
-    'brand_colour': 'navbar-dark',
-    'accent': 'accent-navy',
+    'brand_colour': 'navbar-orange',
+    'accent': 'accent-warning',
     'navbar': 'navbar-dark',
     'no_navbar_border': False,
     'navbar_fixed': True,
     'layout_boxed': False,
     'footer_fixed': False,
     'sidebar_fixed': True,
-    'sidebar': 'sidebar-dark-navy',
+    'sidebar': 'sidebar-dark-warning',
     'sidebar_nav_small_text': False,
     'sidebar_disable_expand': False,
     'sidebar_nav_child_indent': True,
@@ -233,9 +234,9 @@ JAZZMIN_UI_TWEAKS = {
     'sidebar_nav_legacy_style': False,
     'sidebar_nav_flat_style': False,
     'theme': 'default',
-    'default_theme_mode': 'auto',   # 'auto', 'light' o 'dark'
+    'default_theme_mode': 'dark',   # 'auto', 'light' o 'dark'
     'button_classes': {
-        'primary': 'btn-primary',
+        'primary': 'btn-warning',
         'secondary': 'btn-secondary',
         'info': 'btn-info',
         'warning': 'btn-warning',
