@@ -1,8 +1,12 @@
 # core/settings.py
+import sys
 import environ
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# True cuando se ejecuta `python manage.py test`
+TESTING = 'test' in sys.argv
 
 # ── Variables de entorno ──────────────────────────────────────────────────
 env = environ.Env(DEBUG=(bool, True))
@@ -34,6 +38,7 @@ SESSION_COOKIE_SECURE = not DEBUG
 
 # ── Apps instaladas ───────────────────────────────────────────────────────
 # jazzmin debe ir ANTES de django.contrib.admin
+# core/settings.py — actualizar INSTALLED_APPS:
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -49,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',              # ← nuevo (nombre de app es django_filters)
     'whitenoise.runserver_nostatic',
     # Apps del ERP
     'clientes',
@@ -57,6 +63,7 @@ INSTALLED_APPS = [
     'ventas',
     'reportes',
     'configuracion',
+    'catalogo',                    # ← nuevo
     'core',
 ]
 
@@ -76,6 +83,7 @@ ROOT_URLCONF = 'core.urls'
 
 # ── Templates ─────────────────────────────────────────────────────────────
 # Django busca primero en C:\Temp_Workspace_ERP\templates\ (base.html, home.html)
+# core/settings.py — actualizar TEMPLATES[0]['OPTIONS']['context_processors']:
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -87,6 +95,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Context processor del carrito — W13
+                'catalogo.context_processors.carrito_info',
             ],
         },
     },
@@ -117,8 +127,13 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        # Con DEBUG=False, ejecuta `collectstatic` antes de arrancar el servidor
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        # Tests: no exigen el manifiesto (así no fallan por archivos sin collectstatic).
+        # Producción: WhiteNoise con manifiesto; ejecutar `collectstatic` antes de arrancar.
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage'
+            if TESTING else
+            'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
     },
 }
 

@@ -229,12 +229,22 @@
         {% url 'reportes:lista' as rep_lista %}
         {% url 'reportes:dashboard' as rep_dash %}
         {% url 'reportes:index' as rep_index %}
+        {% url 'catalog:catalogo' as tienda_url %}
+        {% url 'catalog:carrito' as carrito_url %}
 
         <a href="{% url 'productos:lista' %}" class="erp-nav-link {% block nav_productos %}{% endblock %}">Productos</a>
         <a href="{% url 'clientes:lista' %}" class="erp-nav-link {% block nav_clientes %}{% endblock %}">Clientes</a>
         <a href="{% url 'proveedores:lista' %}" class="erp-nav-link {% block nav_proveedores %}{% endblock %}">Proveedores</a>
         <a href="{% url 'ventas:lista' %}" class="erp-nav-link {% block nav_ventas %}{% endblock %}">Ventas</a>
         <a href="{{ rep_inicio|default:rep_lista|default:rep_dash|default:rep_index|default:'#' }}" class="erp-nav-link {% block nav_reportes %}{% endblock %}">Reportes</a>
+
+        {% if tienda_url %}
+        <a href="{{ tienda_url }}" class="erp-nav-link {% block nav_catalogo %}{% endblock %}">🛍️ Tienda</a>
+        {% endif %}
+        {% if carrito_url %}
+        <a href="{{ carrito_url }}" class="erp-nav-link" style="position:relative;">🛒{% if carrito_total_items > 0 %} ({{ carrito_total_items }}){% endif %}</a>
+        {% endif %}
+
         <a href="/admin/" class="erp-nav-link">Admin</a>
         {% if user.is_authenticated %}
             <a href="/accounts/logout/" class="erp-nav-link">Salir ({{ user.username }})</a>
