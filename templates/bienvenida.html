@@ -8,16 +8,36 @@
     .letrero h1 { font-family:'Bevan',serif; font-weight:400; margin:0; line-height:1;
         font-size:clamp(2.6rem,7vw,4.4rem); color:var(--clr-title); }
     [data-theme="dark"] .letrero h1 { text-shadow:3px 3px 0 var(--clr-ink), 0 0 28px rgba(255,179,71,.45); }
-    .letrero .apodo { font-family:'Special Elite',monospace; font-size:1.15rem; color:var(--clr-text); margin:.5rem 0 0; }
-    .letrero .sub { color:var(--clr-muted); font-weight:600; margin:.3rem 0 0; }
+    .letrero .apodo { font-family:'Special Elite',monospace; font-size:1.15rem; color:#F1E4C8; margin:.5rem 0 0;
+        text-shadow:0 2px 8px rgba(0,0,0,.95), 0 0 14px rgba(0,0,0,.7); }
+    .letrero .sub { color:#F1E4C8; font-weight:700; margin:.3rem 0 0;
+        text-shadow:0 2px 8px rgba(0,0,0,.95), 0 0 14px rgba(0,0,0,.7); }
+
+    .letrero h1 .ltr { display:inline-block; animation:caer .7s cubic-bezier(.2,.9,.3,1.2) both; }
+    @keyframes caer {
+        from { opacity:0; transform:translateY(-36px) rotate(-10deg); }
+        to   { opacity:1; transform:none; }
+    }
+
+    /* ── Resumen del día ── */
+    .resumen { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; max-width:720px; margin:1.4rem auto 0; }
+    .stat { background:rgba(20,11,6,.8); border:3px solid var(--clr-ink); border-radius:8px; box-shadow:var(--shadow-sm);
+        padding:.6rem .8rem; text-align:center; color:#F1E4C8; }
+    .stat .num { display:block; font-family:'Bevan',serif; font-size:1.8rem; color:#FFB347; line-height:1.1; }
+    .stat small { font-family:'Special Elite',monospace; color:#C9B08A; }
 
     /* ── Caja de discos ── */
     .caja { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:2.2rem 1.5rem; margin-top:1.5rem; }
     .vinilo { position:relative; }
-    .vinilo-stage { position:relative; width:70%; aspect-ratio:1; margin:0 auto 0 0; }
+    .vinilo-stage { position:relative; width:70%; aspect-ratio:1; margin:0 auto 0 0;
+        transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+        transition:transform .25s ease-out; will-change:transform; }
+
+    .js-anim .vinilo { opacity:0; transform:translateY(28px); transition:opacity .6s ease, transform .6s ease; }
+    .js-anim .vinilo.visible { opacity:1; transform:none; }
 
     .disco { position:absolute; inset:0; border-radius:50%; z-index:1; border:2px solid #000;
-        box-shadow:3px 3px 0 var(--clr-ink); transition:transform .5s cubic-bezier(.3,.9,.3,1); }
+        box-shadow:3px 3px 0 var(--clr-ink); transition:transform .6s cubic-bezier(.3,.9,.3,1); }
     .disco-giro { width:100%; height:100%; border-radius:50%;
         background:
             radial-gradient(circle,#0b0b0b 0 3%,transparent 3.5%),
@@ -26,7 +46,7 @@
             repeating-radial-gradient(circle,#141414 0 2px,#252525 3px 4px); }
     .disco-giro span { display:flex; width:100%; height:100%; align-items:center; justify-content:center; text-align:center;
         font-family:'Special Elite',monospace; font-size:.62rem; line-height:1.1; color:#140C07; padding:32%; word-break:break-word; }
-    .vinilo:hover .disco { transform:translateX(30%); }
+    .vinilo:hover .disco { transform:translateX(38%) rotate(60deg); }
 
     .funda { position:relative; z-index:2; width:100%; height:100%; border:3px solid var(--clr-ink); border-radius:3px;
         box-shadow:var(--shadow-md); cursor:pointer; padding:0; overflow:hidden; display:block; text-align:left;
@@ -50,6 +70,15 @@
     .etiqueta a { display:inline-block; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
         font-family:'Work Sans',sans-serif; font-weight:700; font-size:.82rem; padding:.15rem .8rem; text-decoration:none; }
 
+    /* ── Botón de sonido ambiente ── */
+    .btn-sonido { position:fixed; left:18px; bottom:18px; z-index:1500; font-family:'Special Elite',monospace; font-weight:700;
+        font-size:.85rem; color:var(--clr-ink); background:linear-gradient(#FFD27A,#FFB347 55%,#E8962E);
+        border:3px solid var(--clr-ink); border-radius:6px; box-shadow:0 4px 0 #0E0805, 0 8px 16px rgba(0,0,0,.5);
+        padding:.4rem .8rem; cursor:pointer; }
+    .btn-sonido:hover { filter:brightness(1.08); }
+    .btn-sonido .ico { display:inline-block; }
+    .btn-sonido[aria-pressed="true"] .ico { animation:gira 3s linear infinite; }
+
     /* ══════════ FONDO · CAFETERÍA DE VINILOS ══════════ */
     .cafe-fondo { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none;
         background:radial-gradient(ellipse at 50% 15%, #6a3c1c 0%, #2b170c 65%, #160b05 100%); }
@@ -58,7 +87,12 @@
     .cafe-luz { position:absolute; top:-120px; left:50%; width:900px; height:500px; transform:translateX(-50%);
         background:radial-gradient(ellipse at 50% 0%, rgba(255,200,120,.35), transparent 70%); }
 
+    .cafe-spot { position:absolute; inset:0;
+        background:radial-gradient(circle 320px at var(--mx,50%) var(--my,30%), rgba(255,210,140,.20), transparent 70%);
+        mix-blend-mode:screen; transition:background .15s linear; }
+
     .estante { position:absolute; left:-2%; right:-2%; height:120px; opacity:.9;
+        translate:calc(var(--px,0) * -12px) calc(var(--py,0) * -8px); transition:translate .5s ease-out;
         background:repeating-linear-gradient(90deg,
             #B8431A 0 46px, #15202c 46px 48px,
             #E5A32B 48px 92px, #15202c 92px 94px,
@@ -77,7 +111,8 @@
         background:radial-gradient(circle,var(--c1) 0 20%,#000 21% 23%,transparent 24%),
                    conic-gradient(from 30deg,rgba(255,255,255,.1),transparent 15%,transparent 50%,rgba(255,255,255,.08) 60%,transparent 75%),
                    repeating-radial-gradient(circle,#141414 0 2px,#262626 3px 4px);
-        box-shadow:4px 6px 12px rgba(0,0,0,.6); }
+        box-shadow:4px 6px 12px rgba(0,0,0,.6);
+        translate:calc(var(--px,0) * -30px) calc(var(--py,0) * -20px); transition:translate .6s ease-out; }
     .vdisco.d1 { --c1:#B8431A; left:-50px; top:52%; transform:rotate(-12deg); }
     .vdisco.d2 { --c1:#7B3FA0; right:-60px; top:24%; transform:rotate(18deg); width:200px; height:200px; }
     .vdisco.d3 { --c1:#2F5D7A; right:4%; top:56%; transform:rotate(-6deg); width:130px; height:130px; }
@@ -101,16 +136,25 @@
         .vdisco.d3 { display:none; }
         .estante { height:80px; }
         .estante::after { bottom:-12px; height:12px; }
+        .resumen { grid-template-columns:1fr; }
     }
     [data-theme="light"] .cafe-fondo { opacity:.55; }
 
-    @media (prefers-reduced-motion: reduce) { .funda:hover { transform:none; } }
+    @media (prefers-reduced-motion: reduce) {
+        .funda:hover { transform:none; }
+        .letrero h1 .ltr { animation:none; }
+        .js-anim .vinilo { opacity:1; transform:none; transition:none; }
+        .vinilo-stage { transform:none !important; transition:none; }
+        .estante, .vdisco { translate:none; }
+        .btn-sonido[aria-pressed="true"] .ico { animation:none; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="cafe-fondo" aria-hidden="true">
     <div class="cafe-luz"></div>
+    <div class="cafe-spot"></div>
     <div class="estante e1"></div>
     <div class="estante e2"></div>
     <div class="vdisco d1"></div>
@@ -126,6 +170,12 @@
     <h1>Gio's Wax Cellar</h1>
     <p class="apodo">«El sótano del vinilo» · discos, café y buena vibra</p>
     <p class="sub">Sistema de gestión · UTEC Celaya · Espiral 1 W02</p>
+</div>
+
+<div class="resumen" aria-label="Resumen del día">
+    <div class="stat"><span class="num" data-valor="{{ resumen.ventas_hoy|default:0 }}">0</span><small>Ventas hoy</small></div>
+    <div class="stat"><span class="num" data-valor="{{ resumen.productos|default:0 }}">0</span><small>Productos</small></div>
+    <div class="stat"><span class="num" data-valor="{{ resumen.clientes_nuevos|default:0 }}">0</span><small>Clientes nuevos</small></div>
 </div>
 
 <div class="caja">
@@ -239,12 +289,13 @@
     </div>
     {% endfor %}
 </div>
+
+<button type="button" class="btn-sonido" id="btnSonido" aria-pressed="false">
+    <span class="ico" aria-hidden="true">🎵</span> <span id="btnSonidoTxt">Ambiente: apagado</span>
+</button>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-window.VINILOS_DATA = null;
-</script>
 <script>
 (function () {
     /* ═══════════ TUS VINILOS ═══════════
@@ -375,6 +426,127 @@ window.VINILOS_DATA = null;
             var v = VINILOS[+el.dataset.i % VINILOS.length];
             volar(a, v.a);
             setTimeout(function () { window.location.href = href; }, 900);
+        });
+    });
+
+    /* ═══════════ ANIMACIONES INTERACTIVAS ═══════════ */
+    var root = document.documentElement;
+    root.classList.add('js-anim');
+
+    /* 1. Título: cada letra cae en secuencia */
+    var h1 = document.querySelector('.letrero h1');
+    if (h1) {
+        var texto = h1.textContent;
+        h1.textContent = '';
+        h1.setAttribute('aria-label', texto);
+        Array.prototype.forEach.call(texto, function (ch, i) {
+            var s = document.createElement('span');
+            s.className = 'ltr';
+            s.setAttribute('aria-hidden', 'true');
+            s.textContent = ch === ' ' ? '\u00A0' : ch;
+            s.style.animationDelay = (i * 0.06) + 's';
+            h1.appendChild(s);
+        });
+    }
+
+    /* 2. Portadas: aparecen al hacer scroll */
+    var vinilos = document.querySelectorAll('.vinilo');
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entradas) {
+            entradas.forEach(function (en) {
+                if (en.isIntersecting) {
+                    en.target.classList.add('visible');
+                    io.unobserve(en.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        vinilos.forEach(function (el, i) {
+            el.style.transitionDelay = ((i % 3) * 0.08) + 's';
+            io.observe(el);
+        });
+    } else {
+        vinilos.forEach(function (el) { el.classList.add('visible'); });
+    }
+
+    /* 3. Resumen del día: números que suben al cargar */
+    var reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.resumen .num').forEach(function (n) {
+        var fin = +n.dataset.valor || 0;
+        if (reducir) { n.textContent = fin.toLocaleString('es-MX'); return; }
+        var t0 = null;
+        function paso(ts) {
+            if (!t0) t0 = ts;
+            var p = Math.min((ts - t0) / 1200, 1);
+            n.textContent = Math.round(fin * (1 - Math.pow(1 - p, 3))).toLocaleString('es-MX');
+            if (p < 1) requestAnimationFrame(paso);
+        }
+        requestAnimationFrame(paso);
+    });
+
+    /* 4. Sonido ambiente: ruido suave tipo café, apagado por defecto */
+    var btnSonido = document.getElementById('btnSonido');
+    var btnTxt = document.getElementById('btnSonidoTxt');
+    var audioCtx = null, ambGain = null, ambNode = null, sonando = false;
+
+    function iniciarAmbiente() {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (!ambNode) {
+            var len = audioCtx.sampleRate * 4;
+            var buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+            var d = buf.getChannelData(0), last = 0;
+            for (var i = 0; i < len; i++) {
+                var w = Math.random() * 2 - 1;
+                last = (last + 0.02 * w) / 1.02;
+                d[i] = last * 3.5;
+            }
+            ambNode = audioCtx.createBufferSource();
+            ambNode.buffer = buf;
+            ambNode.loop = true;
+            ambGain = audioCtx.createGain();
+            ambGain.gain.value = 0;
+            ambNode.connect(ambGain).connect(audioCtx.destination);
+            ambNode.start();
+        }
+    }
+
+    if (btnSonido) {
+        btnSonido.addEventListener('click', function () {
+            iniciarAmbiente();
+            audioCtx.resume();
+            sonando = !sonando;
+            var t = audioCtx.currentTime;
+            ambGain.gain.cancelScheduledValues(t);
+            ambGain.gain.setValueAtTime(ambGain.gain.value, t);
+            ambGain.gain.linearRampToValueAtTime(sonando ? 0.06 : 0, t + 1.2);
+            btnSonido.setAttribute('aria-pressed', String(sonando));
+            btnTxt.textContent = sonando ? 'Ambiente: encendido' : 'Ambiente: apagado';
+        });
+    }
+
+    /* Lo siguiente solo se activa si el usuario no pidió reducir animaciones */
+    if (reducir) return;
+
+    /* 5. Mouse: paralaje del fondo y foco de luz */
+    document.addEventListener('mousemove', function (e) {
+        root.style.setProperty('--px', (e.clientX / window.innerWidth - 0.5).toFixed(3));
+        root.style.setProperty('--py', (e.clientY / window.innerHeight - 0.5).toFixed(3));
+        root.style.setProperty('--mx', e.clientX + 'px');
+        root.style.setProperty('--my', e.clientY + 'px');
+    });
+
+    /* 6. Portadas: se inclinan hacia el cursor */
+    vinilos.forEach(function (el) {
+        var stage = el.querySelector('.vinilo-stage');
+        el.addEventListener('mousemove', function (e) {
+            var r = el.getBoundingClientRect();
+            var x = (e.clientX - r.left) / r.width - 0.5;
+            var y = (e.clientY - r.top) / r.height - 0.5;
+            stage.style.setProperty('--rx', (-y * 14).toFixed(2) + 'deg');
+            stage.style.setProperty('--ry', (x * 14).toFixed(2) + 'deg');
+        });
+        el.addEventListener('mouseleave', function () {
+            stage.style.setProperty('--rx', '0deg');
+            stage.style.setProperty('--ry', '0deg');
         });
     });
 })();
