@@ -11,24 +11,13 @@
     .letrero .apodo { font-family:'Special Elite',monospace; font-size:1.15rem; color:var(--clr-text); margin:.5rem 0 0; }
     .letrero .sub { color:var(--clr-muted); font-weight:600; margin:.3rem 0 0; }
 
-    /* ── Tocadiscos: "sonando ahora" ── */
-    .sonando-ahora { max-width:520px; margin:1.2rem auto 0; padding:.55rem 1rem; display:flex; align-items:center; gap:.8rem;
-        background:var(--clr-navy); color:#F1E4C8; border:3px solid var(--clr-ink); border-radius:6px; box-shadow:var(--shadow-sm);
-        font-family:'Special Elite',monospace; }
-    .sonando-ahora .led { width:10px; height:10px; border-radius:50%; background:#555; flex-shrink:0; }
-    .sonando-ahora.on .led { background:#FFB347; box-shadow:0 0 10px 3px rgba(255,179,71,.8); animation:parpadeo 1.2s ease-in-out infinite; }
-    .sonando-ahora button { margin-left:auto; background:var(--clr-royal); border:2px solid var(--clr-ink); border-radius:4px;
-        font-weight:700; padding:.1rem .7rem; color:var(--clr-ink); display:none; }
-    .sonando-ahora.on button { display:block; }
-
-    /* ── Caja de discos ── */
+    /* ── Caja de discos (vista normal) ── */
     .caja { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:2.2rem 1.5rem; margin-top:1.5rem; }
     .vinilo { position:relative; }
     .vinilo-stage { position:relative; width:70%; aspect-ratio:1; margin:0 auto 0 0; }
 
-    /* El disco: surcos + etiqueta central */
     .disco { position:absolute; inset:0; border-radius:50%; z-index:1; border:2px solid #000;
-        box-shadow:3px 3px 0 var(--clr-ink); transition:transform .8s cubic-bezier(.3,.9,.3,1); }
+        box-shadow:3px 3px 0 var(--clr-ink); transition:transform .5s cubic-bezier(.3,.9,.3,1); }
     .disco-giro { width:100%; height:100%; border-radius:50%;
         background:
             radial-gradient(circle,#0b0b0b 0 3%,transparent 3.5%),
@@ -37,10 +26,8 @@
             repeating-radial-gradient(circle,#141414 0 2px,#252525 3px 4px); }
     .disco-giro span { display:flex; width:100%; height:100%; align-items:center; justify-content:center; text-align:center;
         font-family:'Special Elite',monospace; font-size:.62rem; line-height:1.1; color:#140C07; padding:32%; word-break:break-word; }
-    .vinilo.sonando .disco { transform:translateX(42%); }
-    .vinilo.sonando .disco-giro { animation:gira 2.4s linear infinite; }
+    .vinilo:hover .disco { transform:translateX(30%); }
 
-    /* La funda: portada de cartón */
     .funda { position:relative; z-index:2; width:100%; height:100%; border:3px solid var(--clr-ink); border-radius:3px;
         box-shadow:var(--shadow-md); cursor:pointer; padding:0; overflow:hidden; display:block; text-align:left;
         background:
@@ -51,46 +38,65 @@
     .funda::after { content:""; position:absolute; inset:0; pointer-events:none;
         background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 2px,transparent 2px 5px); }
     .funda:hover { transform:translate(-3px,-3px) rotate(-1deg); box-shadow:9px 9px 0 var(--clr-ink); }
-    .vinilo.sonando .funda { transform:translateX(-6%); }
     .funda-icono { position:absolute; right:14%; top:13%; font-size:2rem; }
     .funda-artista { position:absolute; left:8%; right:8%; bottom:26%; font-family:'Bevan',serif; font-size:1.55rem; line-height:1.02; color:#FFF6DC; text-shadow:2px 2px 0 rgba(0,0,0,.55); }
     .funda-disco { position:absolute; left:8%; right:8%; bottom:12%; font-family:'Special Elite',monospace; font-size:.85rem; color:#FFF6DC; opacity:.9; }
 
-    /* Etiqueta de precio con el módulo */
     .etiqueta { margin-top:1rem; padding:.55rem .8rem; background:#F1E4C8; color:#2A1A10; border:2px solid var(--clr-ink);
         border-radius:3px; box-shadow:3px 3px 0 var(--clr-ink); font-family:'Special Elite',monospace; transform:rotate(-.8deg); }
     .vinilo:nth-child(even) .etiqueta { transform:rotate(.8deg); }
-    .vinilo.sonando .etiqueta { box-shadow:6px 6px 0 var(--clr-ink); transform:rotate(0deg); }
     .etiqueta strong { display:block; font-family:'Bevan',serif; font-weight:400; font-size:1.15rem; }
     .etiqueta p { margin:.15rem 0 .45rem; font-size:.8rem; }
-
-    /* Reproductor de Spotify: compacto y oculto hasta que el vinilo suene */
-    .etiqueta iframe {
-        display:none;
-        width:100%;
-        height:80px;
-        border:0;
-        border-radius:12px;
-        margin:.4rem 0 .6rem;
-    }
-    .vinilo.sonando .etiqueta iframe { display:block; animation:aparece .5s ease; }
-
-    .etiqueta a { display:none; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
+    .etiqueta a { display:inline-block; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
         font-family:'Work Sans',sans-serif; font-weight:700; font-size:.82rem; padding:.15rem .8rem; text-decoration:none; }
-    .vinilo.sonando .etiqueta a { display:inline-block; }
+
+    /* ── Tocadiscos (overlay al centro) ── */
+    .tt { position:fixed; inset:0; z-index:900; background:rgba(10,6,3,.82); display:flex; align-items:center; justify-content:center;
+        padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
+    .tt.open { opacity:1; pointer-events:auto; }
+    .tt-box { width:min(480px,100%); max-height:96vh; overflow-y:auto; background:var(--clr-navy); color:#F1E4C8;
+        border:3px solid var(--clr-ink); border-radius:14px; box-shadow:0 12px 0 var(--clr-ink); padding:18px;
+        text-align:center; font-family:'Special Elite',monospace; }
+    .tt-box h2 { font-family:'Bevan',serif; font-weight:400; color:#FFB347; margin:0 0 12px; font-size:1.3rem; }
+
+    .tt-deck { position:relative; width:260px; height:260px; margin:0 auto; border-radius:14px; background:#0c0704;
+        border:3px solid #000; overflow:hidden; }
+    .tt-plato { position:absolute; inset:8px; border-radius:50%; background:#111; display:grid; place-items:center; }
+    .tt-disco { width:244px; height:244px; border-radius:50%; transform:translateY(-270px);
+        transition:transform .9s cubic-bezier(.3,1.3,.5,1); }
+    .tt.open .tt-disco { transform:translateY(0); }
+    .tt-surco { width:100%; height:100%; border-radius:50%; position:relative; animation:gira 2.4s linear infinite;
+        animation-play-state:paused;
+        background:
+            radial-gradient(circle,var(--a) 0 22%,#000 23% 25%,transparent 26%),
+            repeating-radial-gradient(circle,#151515 0 2px,#252525 3px 4px); }
+    .tt.playing .tt-surco { animation-play-state:running; }
+    .tt-etiq { position:absolute; left:50%; top:50%; width:38%; height:38%; transform:translate(-50%,-50%); border-radius:50%;
+        border:3px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
+    .tt-brazo { position:absolute; top:-14px; right:-18px; width:9px; height:150px; border-radius:6px;
+        background:linear-gradient(90deg,#999,#ddd); transform-origin:4px 4px; transform:rotate(-30deg);
+        transition:transform .8s ease; }
+    .tt.playing .tt-brazo { transform:rotate(-6deg); }
+
+    #ttSpot iframe { display:block; width:100%; height:152px; border:0; border-radius:12px; margin-top:14px; }
+
+    .btn { font-family:inherit; font-weight:700; background:#FFB347; color:var(--clr-ink); border:3px solid var(--clr-ink);
+        border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink); padding:.45rem .9rem; margin:.4rem .2rem 0; cursor:pointer; }
+    .btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--clr-ink); }
+
+    .tt-picker { display:none; gap:10px; overflow-x:auto; padding:12px 4px; margin-top:10px; }
+    .tt-picker.show { display:flex; }
+    .pick { flex:0 0 84px; cursor:pointer; font-size:.7rem; text-align:center; color:#F1E4C8; }
+    .pick .c { width:84px; height:84px; border:3px solid #000; background-size:cover; background-position:center; margin-bottom:4px; }
+    .pick.act .c { outline:3px solid #FFB347; }
+
+    /* ── Vinilos volando ── */
+    .volador { position:fixed; width:40px; height:40px; border-radius:50%; border:2px solid #000; pointer-events:none; z-index:1000; }
 
     @keyframes gira { to { transform:rotate(360deg); } }
-    @keyframes aparece {
-        from { opacity:0; transform:translateY(-6px); }
-        to   { opacity:1; transform:none; }
-    }
-    @keyframes parpadeo {
-        0%, 100% { opacity:1; }
-        50% { opacity:.4; }
-    }
 
     @media (prefers-reduced-motion: reduce) {
-        .vinilo.sonando .disco-giro, .sonando-ahora.on .led, .vinilo.sonando .etiqueta iframe { animation:none; }
+        .tt-surco { animation:none; }
         .funda:hover { transform:none; }
     }
 </style>
@@ -101,11 +107,6 @@
     <h1>Gio's Wax Cellar</h1>
     <p class="apodo">«El sótano del vinilo» · discos, café y buena vibra</p>
     <p class="sub">Sistema de gestión · UTEC Celaya · Espiral 1 W02</p>
-    <div class="sonando-ahora" id="ahora" role="status" aria-live="polite">
-        <span class="led"></span>
-        <span id="ahoraTxt">Toca una portada para sacar el disco</span>
-        <button type="button" id="ahoraStop">Cerrar</button>
-    </div>
 </div>
 
 <div class="caja">
@@ -126,7 +127,6 @@
         </div>
     </div>
     {% empty %}
-    {# Respaldo: si la vista no manda 'modulos', se muestran estos #}
     {% url 'reportes:inicio' as rep_inicio %}{% url 'reportes:lista' as rep_lista %}{% url 'reportes:dashboard' as rep_dash %}{% url 'reportes:index' as rep_index %}
     <div class="vinilo" data-i="0">
         <div class="vinilo-stage">
@@ -220,6 +220,28 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- Tocadiscos -->
+<div class="tt" id="tt" role="dialog" aria-modal="true" aria-labelledby="ttTitulo">
+    <div class="tt-box">
+        <h2 id="ttTitulo"></h2>
+        <div class="tt-deck">
+            <div class="tt-plato">
+                <div class="tt-disco">
+                    <div class="tt-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
+                </div>
+            </div>
+            <div class="tt-brazo"></div>
+        </div>
+        <div id="ttSpot"></div>
+        <div>
+            <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
+            <button type="button" class="btn" id="ttElegir">💿 Elegir vinilo</button>
+            <button type="button" class="btn" id="ttNormal">Vista normal</button>
+        </div>
+        <div class="tt-picker" id="ttPicker"></div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -228,9 +250,8 @@
     /* ═══════════ TUS VINILOS ═══════════
        Un vinilo por módulo, en orden.
        - artista / disco : lo que se ve en la portada.
-       - img             : imagen propia dentro de static/img/ (opcional).
+       - img             : imagen dentro de static/img/ (opcional).
        - embed           : enlace de inserción de Spotify (/embed/track/...).
-                           Si está vacío, el vinilo no muestra reproductor.
        - a, b, c         : colores de la portada y del centro del disco. */
     var VINILOS = [
         { artista:'Sabrina Carpenter', disco:'Edición Gio #1', img:'{% static "img/edicion1.jpg" %}', embed:'https://open.spotify.com/embed/track/2LU2CYKUZUc1iAErxJb1dK', a:'#F0B547', b:'#FFF6DC', c:'#B8431A' },
@@ -241,11 +262,15 @@
         { artista:'Malcolm Todd',      disco:'Edición Gio #6', img:'{% static "img/edicion6.jpg" %}', embed:'https://open.spotify.com/embed/track/59c2xv2kMzYM6HR9oY6BIa', a:'#6B8E4E', b:'#F1E4C8', c:'#1F2E14' }
     ];
 
+    var ov = document.getElementById('tt');
+    var ttTitulo = document.getElementById('ttTitulo');
+    var ttEtiq = document.getElementById('ttEtiq');
+    var ttSpot = document.getElementById('ttSpot');
+    var ttPicker = document.getElementById('ttPicker');
+    var ttGirar = document.getElementById('ttGirar');
     var vinilos = document.querySelectorAll('.vinilo');
-    var ahora = document.getElementById('ahora'), txt = document.getElementById('ahoraTxt');
-    var actual = null;
 
-    /* ── Portadas y reproductor de Spotify ── */
+    /* ── Portadas de la caja ── */
     vinilos.forEach(function (el, i) {
         var v = VINILOS[i % VINILOS.length];
         var funda = el.querySelector('.funda');
@@ -253,39 +278,104 @@
         el.querySelector('.funda-artista').textContent = v.artista;
         el.querySelector('.funda-disco').textContent = v.disco;
         if (v.img) funda.style.backgroundImage = 'url(' + v.img + ')';
+        funda.addEventListener('click', function () { abrir(i); });
+    });
+
+    /* ── Selector de vinilos (barra) ── */
+    VINILOS.forEach(function (v, i) {
+        var p = document.createElement('div');
+        p.className = 'pick';
+        p.innerHTML = '<div class="c"></div>' + v.artista;
+        var c = p.querySelector('.c');
+        c.style.background = 'linear-gradient(160deg,' + v.a + ',' + v.c + ')';
+        if (v.img) c.style.backgroundImage = 'url(' + v.img + ')';
+        p.addEventListener('click', function () { abrir(i); });
+        ttPicker.appendChild(p);
+    });
+
+    function marcarPicker(i) {
+        ttPicker.querySelectorAll('.pick').forEach(function (p, idx) {
+            p.classList.toggle('act', idx === i);
+        });
+    }
+
+    /* ── Abrir / cerrar tocadiscos ── */
+    function abrir(i) {
+        var v = VINILOS[i];
+        ov.style.setProperty('--a', v.a); ov.style.setProperty('--b', v.b); ov.style.setProperty('--c', v.c);
+        ttTitulo.textContent = v.artista + ' · ' + v.disco;
+        ttEtiq.style.backgroundImage = v.img ? 'url(' + v.img + ')' : '';
+
+        ttSpot.innerHTML = '';
         if (v.embed) {
             var f = document.createElement('iframe');
             f.src = v.embed;
-            f.width = '100%';
-            f.height = '80';
-            f.frameBorder = '0';
+            f.title = 'Spotify: ' + v.artista;
+            f.allow = 'autoplay; clipboard-write; encrypted-media; picture-in-picture';
             f.loading = 'lazy';
-            f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            f.title = 'Reproductor de Spotify: ' + v.artista;
-            el.querySelector('.etiqueta').insertBefore(f, el.querySelector('.etiqueta a'));
+            ttSpot.appendChild(f);
         }
+
+        marcarPicker(i);
+        ov.classList.remove('playing');
+        ov.classList.add('open');
+        setTimeout(function () { ov.classList.add('playing'); }, 900);
+        actualizarBoton();
+    }
+
+    function cerrar() {
+        ov.classList.remove('open', 'playing');
+        ttSpot.innerHTML = ''; // detiene la música al cerrar
+        ttPicker.classList.remove('show');
+    }
+
+    function actualizarBoton() {
+        ttGirar.textContent = ov.classList.contains('playing') ? '⏸ Pausa' : '⏵ Girar';
+    }
+
+    ttGirar.addEventListener('click', function () {
+        ov.classList.toggle('playing');
+        actualizarBoton();
     });
+    document.getElementById('ttElegir').addEventListener('click', function () {
+        ttPicker.classList.toggle('show');
+    });
+    document.getElementById('ttNormal').addEventListener('click', cerrar);
+    ov.addEventListener('click', function (e) { if (e.target === ov) cerrar(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrar(); });
 
-    function parar() {
-        vinilos.forEach(function (x) { x.classList.remove('sonando'); });
-        ahora.classList.remove('on');
-        txt.textContent = 'Toca una portada para sacar el disco';
-        actual = null;
+    /* ── Vinilos volando al abrir un módulo ── */
+    function volar(el, color) {
+        var r = el.getBoundingClientRect();
+        for (var k = 0; k < 14; k++) {
+            var d = document.createElement('div');
+            d.className = 'volador';
+            d.style.background = 'radial-gradient(circle,' + color + ' 0 25%,#0b0b0b 26%,#222 60%,#0b0b0b 100%)';
+            d.style.left = (r.left + r.width / 2 - 20) + 'px';
+            d.style.top = (r.top + r.height / 2 - 20) + 'px';
+            document.body.appendChild(d);
+
+            var dx = (Math.random() - 0.5) * window.innerWidth * 0.9;
+            var dy = -(Math.random() * window.innerHeight * 0.6 + 120);
+            d.animate([
+                { transform: 'translate(0,0) rotate(0deg) scale(.6)', opacity: 1 },
+                { transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(900deg) scale(1)', opacity: 0 }
+            ], { duration: 1100 + Math.random() * 600, delay: k * 60, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' })
+              .onfinish = (function (node) { return function () { node.remove(); }; })(d);
+        }
     }
 
-    function tocar(el) {
-        var v = VINILOS[+el.dataset.i % VINILOS.length];
-        parar(); actual = el;
-        el.classList.add('sonando'); ahora.classList.add('on');
-        txt.textContent = 'Reproductor de: ' + v.artista + ' · ' + v.disco;
-    }
-
-    vinilos.forEach(function (el) {
-        el.querySelector('.funda').addEventListener('click', function () {
-            if (actual === el) parar(); else tocar(el);
+    document.querySelectorAll('.vinilo .etiqueta a').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            var href = a.getAttribute('href');
+            if (!href || href === '#') return;
+            e.preventDefault();
+            var el = a.closest('.vinilo');
+            var v = VINILOS[+el.dataset.i % VINILOS.length];
+            volar(a, v.a);
+            setTimeout(function () { window.location.href = href; }, 900);
         });
     });
-    document.getElementById('ahoraStop').addEventListener('click', parar);
 })();
 </script>
 {% endblock %}

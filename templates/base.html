@@ -141,7 +141,44 @@
             font-size:.85rem; padding:.9rem; border-top:4px solid var(--clr-royal);
             background:repeating-linear-gradient(90deg,rgba(0,0,0,.25) 0 2px,transparent 2px 70px),var(--clr-navy); }
 
-        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco { animation:none; } * { transition:none !important; } }
+        /* ══════════ NUEVO · TOCADISCOS (overlay global) ══════════ */
+        .tt { position:fixed; inset:0; z-index:2000; background:rgba(10,6,3,.82); display:flex; align-items:center; justify-content:center;
+            padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
+        .tt.open { opacity:1; pointer-events:auto; }
+        .tt-box { width:min(480px,100%); max-height:96vh; overflow-y:auto; background:var(--clr-navy); color:#F1E4C8;
+            border:3px solid var(--clr-ink); border-radius:14px; box-shadow:0 12px 0 var(--clr-ink); padding:18px;
+            text-align:center; font-family:'Special Elite',monospace; }
+        .tt-box h2 { font-family:'Bevan',serif; font-weight:400; color:#FFB347; margin:0 0 12px; font-size:1.3rem; }
+        .tt-deck { position:relative; width:260px; height:260px; margin:0 auto; border-radius:14px; background:#0c0704;
+            border:3px solid #000; overflow:hidden; }
+        .tt-plato { position:absolute; inset:8px; border-radius:50%; background:#111; display:grid; place-items:center; }
+        .tt-disco { width:244px; height:244px; border-radius:50%; transform:translateY(-270px);
+            transition:transform .9s cubic-bezier(.3,1.3,.5,1); }
+        .tt.open .tt-disco { transform:translateY(0); }
+        .tt-surco { width:100%; height:100%; border-radius:50%; position:relative; animation:gira 2.4s linear infinite;
+            animation-play-state:paused;
+            background:
+                radial-gradient(circle,var(--a) 0 22%,#000 23% 25%,transparent 26%),
+                repeating-radial-gradient(circle,#151515 0 2px,#252525 3px 4px); }
+        .tt.playing .tt-surco { animation-play-state:running; }
+        .tt-etiq { position:absolute; left:50%; top:50%; width:38%; height:38%; transform:translate(-50%,-50%); border-radius:50%;
+            border:3px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
+        .tt-brazo { position:absolute; top:-14px; right:-18px; width:9px; height:150px; border-radius:6px;
+            background:linear-gradient(90deg,#999,#ddd); transform-origin:4px 4px; transform:rotate(-30deg);
+            transition:transform .8s ease; }
+        .tt.playing .tt-brazo { transform:rotate(-6deg); }
+        #ttSpot iframe { display:block; width:100%; height:152px; border:0; border-radius:12px; margin-top:14px; }
+        .tt .btn { font-family:inherit; font-weight:700; background:#FFB347; color:var(--clr-ink); border:3px solid var(--clr-ink);
+            border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink); padding:.45rem .9rem; margin:.4rem .2rem 0; cursor:pointer; }
+        .tt .btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--clr-ink); }
+        .tt-picker { display:none; gap:10px; overflow-x:auto; padding:12px 4px; margin-top:10px; }
+        .tt-picker.show { display:flex; }
+        .pick { flex:0 0 84px; cursor:pointer; font-size:.7rem; text-align:center; color:#F1E4C8; }
+        .pick .c { width:84px; height:84px; border:3px solid #000; background-size:cover; background-position:center; margin-bottom:4px; }
+        .pick.act .c { outline:3px solid #FFB347; }
+        .volador { position:fixed; width:40px; height:40px; border-radius:50%; border:2px solid #000; pointer-events:none; z-index:2100; }
+
+        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco,.tt-surco { animation:none; } * { transition:none !important; } }
         @media (max-width:576px) { .erp-page-title h2 { font-size:1.7rem; } }
     </style>
     {% block extra_css %}{% endblock %}
@@ -197,6 +234,28 @@
 <footer class="erp-footer">
     Gio's Wax Cellar · ERP Django 4.2 LTS · UTEC Celaya · Espiral 1 · Hecho por Gio
 </footer>
+
+<!-- NUEVO · Tocadiscos (disponible en todas las páginas) -->
+<div class="tt" id="tt" role="dialog" aria-modal="true" aria-labelledby="ttTitulo">
+    <div class="tt-box">
+        <h2 id="ttTitulo"></h2>
+        <div class="tt-deck">
+            <div class="tt-plato">
+                <div class="tt-disco">
+                    <div class="tt-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
+                </div>
+            </div>
+            <div class="tt-brazo"></div>
+        </div>
+        <div id="ttSpot"></div>
+        <div>
+            <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
+            <button type="button" class="btn" id="ttElegir">💿 Elegir vinilo</button>
+            <button type="button" class="btn" id="ttNormal">Vista normal</button>
+        </div>
+        <div class="tt-picker" id="ttPicker"></div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
