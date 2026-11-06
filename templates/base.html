@@ -1,472 +1,334 @@
-{% extends "base.html" %}
-{% load static %}
-{% block title %}Inicio{% endblock %}
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1C100A">
+    <title>{% block title %}ERP Django{% endblock %} · Gio's Wax Cellar</title>
 
-{% block extra_css %}
-<style>
-    .letrero { text-align:center; padding:.5rem 0 1.5rem; }
-    .letrero h1 { font-family:'Bevan',serif; font-weight:400; margin:0; line-height:1;
-        font-size:clamp(2.6rem,7vw,4.4rem); color:var(--clr-title); }
-    [data-theme="dark"] .letrero h1 { text-shadow:3px 3px 0 var(--clr-ink), 0 0 28px rgba(255,179,71,.45); }
-    .letrero .apodo { font-family:'Special Elite',monospace; font-size:1.15rem; color:var(--clr-text); margin:.5rem 0 0; }
-    .letrero .sub { color:var(--clr-muted); font-weight:600; margin:.3rem 0 0; }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bevan&family=Work+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    /* Título: letras que caen una por una */
-    .letrero h1 .ltr { display:inline-block; animation:caer .7s cubic-bezier(.2,.9,.3,1.2) both; }
-    @keyframes caer {
-        from { opacity:0; transform:translateY(-36px) rotate(-10deg); }
-        to   { opacity:1; transform:none; }
-    }
+    <style>
+        /* ══════════ TOKENS · NOCHE ══════════ */
+        :root, [data-theme="dark"] {
+            --clr-navy:#1C100A; --clr-royal:#FFB347; --clr-sky:#E5A32B; --clr-ice:#33200F;
+            --clr-gold:#FFB347; --clr-amber:#FFC56E; --clr-cream:#44291A;
+            --clr-bg:#2B1A12; --clr-surface:#3A2418; --clr-text:#F1E4C8; --clr-muted:#C9B08A;
+            --clr-border:#1C100A; --clr-danger:#FF7A59; --clr-ok:#9BCB6B; --clr-ink:#0E0805;
+            --clr-rust:#9C3B1F; --clr-title:#FFB347; --clr-code:#FFC56E;
+            --shadow-sm:3px 3px 0 var(--clr-ink); --shadow-md:6px 6px 0 var(--clr-ink);
+        }
+        /* ══════════ TOKENS · DÍA ══════════ */
+        [data-theme="light"] {
+            --clr-navy:#3B2314; --clr-royal:#D9822B; --clr-sky:#F0B547; --clr-ice:#F6E6C4;
+            --clr-gold:#9C3B1F; --clr-amber:#D9822B; --clr-cream:#F3DDB0;
+            --clr-bg:#E7CFA8; --clr-surface:#FFF6E2; --clr-text:#2A1A10; --clr-muted:#7B5B3E;
+            --clr-border:#C9A672; --clr-danger:#B3261E; --clr-ok:#2F7A2B; --clr-title:#9C3B1F; --clr-code:#9C3B1F;
+        }
 
-    /* ── Caja de discos ── */
-    .caja { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:2.2rem 1.5rem; margin-top:1.5rem; }
-    .vinilo { position:relative; }
-    .vinilo-stage { position:relative; width:70%; aspect-ratio:1; margin:0 auto 0 0;
-        transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
-        transition:transform .25s ease-out; will-change:transform; }
+        *, *::before, *::after { box-sizing:border-box; }
+        body {
+            font-family:'Work Sans','Segoe UI',sans-serif; font-size:15.5px; line-height:1.6; margin:0;
+            color:var(--clr-text); background-color:var(--clr-bg);
+            background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='112' height='56' fill='none' stroke='%23000' stroke-opacity='.28' stroke-width='3'><path d='M0 0H112M0 28H112M0 56H112M56 0V28M0 28V56M112 28V56'/></svg>");
+            background-size:112px 56px;
+            transition:background-color .25s,color .25s;
+        }
+        body::after {
+            content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+            background:radial-gradient(ellipse at 50% 30%, rgba(255,179,71,.14), rgba(0,0,0,.45) 85%);
+        }
+        [data-theme="light"] body::after { background:radial-gradient(ellipse at 50% 20%, rgba(255,255,255,.35), rgba(120,60,20,.22) 90%); }
+        a:focus-visible, button:focus-visible, .erp-input:focus-visible { outline:3px solid var(--clr-royal); outline-offset:2px; }
 
-    /* Revelado al hacer scroll (solo si JavaScript está activo) */
-    .js-anim .vinilo { opacity:0; transform:translateY(28px); transition:opacity .6s ease, transform .6s ease; }
-    .js-anim .vinilo.visible { opacity:1; transform:none; }
+        /* ══════════ NAVBAR ══════════ */
+        .erp-navbar {
+            position:relative; z-index:5; padding:.7rem 1.5rem;
+            display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem;
+            background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 9px),var(--clr-navy);
+            border-bottom:4px solid var(--clr-royal); box-shadow:0 4px 0 var(--clr-ink);
+        }
+        .erp-brand { display:flex; align-items:center; gap:.7rem; text-decoration:none;
+            font-family:'Bevan',serif; font-size:1.55rem; color:var(--clr-royal) !important; text-shadow:2px 2px 0 var(--clr-ink); }
+        .erp-brand small { font-family:'Special Elite',monospace; font-size:.62em; color:#F1E4C8; text-shadow:none; letter-spacing:.04em; }
+        .mini-disco { width:34px; height:34px; border-radius:50%; flex-shrink:0; border:2px solid #000;
+            background:radial-gradient(circle,var(--clr-royal) 0 22%,#000 23% 26%,transparent 27%),
+                       repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px);
+            animation:gira 4s linear infinite; }
+        @keyframes gira { to { transform:rotate(360deg); } }
+        .erp-nav-links { display:flex; align-items:center; gap:.25rem; flex-wrap:wrap; }
+        .erp-nav-link { color:#F1E4C8 !important; font-size:.93rem; font-weight:700; padding:.3rem .85rem;
+            border-radius:6px; border:2px solid transparent; text-decoration:none; transition:background .15s,color .15s; }
+        .erp-nav-link:hover { background:var(--clr-royal); color:var(--clr-ink) !important; border-color:var(--clr-ink); }
+        .erp-nav-link.active { background:var(--clr-cream); color:var(--clr-royal) !important; border-color:var(--clr-royal); }
+        .theme-toggle { background:var(--clr-royal); color:var(--clr-ink); border:2.5px solid var(--clr-ink);
+            border-radius:50%; width:34px; height:34px; cursor:pointer; margin-left:.4rem; box-shadow:2px 2px 0 var(--clr-ink); }
+        .theme-toggle:hover { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--clr-ink); }
 
-    .disco { position:absolute; inset:0; border-radius:50%; z-index:1; border:2px solid #000;
-        box-shadow:3px 3px 0 var(--clr-ink); transition:transform .5s cubic-bezier(.3,.9,.3,1); }
-    .disco-giro { width:100%; height:100%; border-radius:50%;
-        background:
-            radial-gradient(circle,#0b0b0b 0 3%,transparent 3.5%),
-            radial-gradient(circle,var(--a) 0 30%,#000 31% 33%,transparent 34%),
-            conic-gradient(from 20deg,rgba(255,255,255,.14),transparent 12%,transparent 45%,rgba(255,255,255,.12) 55%,transparent 68%,transparent 95%,rgba(255,255,255,.14)),
-            repeating-radial-gradient(circle,#141414 0 2px,#252525 3px 4px); }
-    .disco-giro span { display:flex; width:100%; height:100%; align-items:center; justify-content:center; text-align:center;
-        font-family:'Special Elite',monospace; font-size:.62rem; line-height:1.1; color:#140C07; padding:32%; word-break:break-word; }
-    .vinilo:hover .disco { transform:translateX(30%); }
+        /* ══════════ FOCOS (detrás del contenido) ══════════ */
+        .focos { position:relative; z-index:0; height:0; pointer-events:none; }
+        .foco { position:absolute; top:0; width:2px; background:#0E0805; transform-origin:top; animation:mece 6s ease-in-out infinite; }
+        .foco::after { content:""; position:absolute; left:50%; bottom:-14px; width:16px; height:20px; transform:translateX(-50%);
+            border-radius:50% 50% 45% 45%; background:radial-gradient(circle at 50% 35%,#FFF3C4,#FFB347 70%);
+            box-shadow:0 0 18px 8px rgba(255,179,71,.55); }
+        @keyframes mece { 0%,100%{transform:rotate(-1.2deg)} 50%{transform:rotate(1.2deg)} }
 
-    .funda { position:relative; z-index:2; width:100%; height:100%; border:3px solid var(--clr-ink); border-radius:3px;
-        box-shadow:var(--shadow-md); cursor:pointer; padding:0; overflow:hidden; display:block; text-align:left;
-        background:
-            radial-gradient(circle at 78% 24%,var(--b) 0 17%,transparent 18%),
-            linear-gradient(160deg,var(--a),var(--c));
-        background-size:cover; background-position:center;
-        transition:transform .25s,box-shadow .25s; }
-    .funda::after { content:""; position:absolute; inset:0; pointer-events:none;
-        background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 2px,transparent 2px 5px); }
-    .funda:hover { transform:translate(-3px,-3px) rotate(-1deg); box-shadow:9px 9px 0 var(--clr-ink); }
-    .funda-icono { position:absolute; right:14%; top:13%; font-size:2rem; }
-    .funda-artista { position:absolute; left:8%; right:8%; bottom:26%; font-family:'Bevan',serif; font-size:1.55rem; line-height:1.02; color:#FFF6DC; text-shadow:2px 2px 0 rgba(0,0,0,.55); }
-    .funda-disco { position:absolute; left:8%; right:8%; bottom:12%; font-family:'Special Elite',monospace; font-size:.85rem; color:#FFF6DC; opacity:.9; }
+        /* ══════════ CONTENIDO ══════════ */
+        .erp-main { position:relative; z-index:1; padding:2.5rem 0; min-height:calc(100vh - 110px); }
+        .container { position:relative; z-index:1; }
 
-    .etiqueta { margin-top:1rem; padding:.55rem .8rem; background:#F1E4C8; color:#2A1A10; border:2px solid var(--clr-ink);
-        border-radius:3px; box-shadow:3px 3px 0 var(--clr-ink); font-family:'Special Elite',monospace; transform:rotate(-.8deg); }
-    .vinilo:nth-child(even) .etiqueta { transform:rotate(.8deg); }
-    .etiqueta strong { display:block; font-family:'Bevan',serif; font-weight:400; font-size:1.15rem; }
-    .etiqueta p { margin:.15rem 0 .45rem; font-size:.8rem; }
-    .etiqueta a { display:inline-block; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
-        font-family:'Work Sans',sans-serif; font-weight:700; font-size:.82rem; padding:.15rem .8rem; text-decoration:none; }
+        /* ══════════ TARJETAS ══════════ */
+        .erp-card { background:var(--clr-surface); border:3px solid var(--clr-ink); border-radius:6px;
+            box-shadow:var(--shadow-md); padding:1.5rem; margin-bottom:1.75rem; }
+        .erp-card-header { background:var(--clr-royal); color:var(--clr-ink); border-bottom:3px solid var(--clr-ink);
+            border-radius:3px 3px 0 0; padding:.6rem 1.25rem; font-family:'Bevan',serif; font-size:1.2rem; margin:-1.5rem -1.5rem 1.5rem; }
 
-    /* ══════════ FONDO · CAFETERÍA DE VINILOS ══════════ */
-    .cafe-fondo { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none;
-        background:radial-gradient(ellipse at 50% 15%, #6a3c1c 0%, #2b170c 65%, #160b05 100%); }
-    .cafe-fondo::after { content:""; position:absolute; inset:0;
-        background:radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(10,5,2,.75) 100%); }
-    .cafe-luz { position:absolute; top:-120px; left:50%; width:900px; height:500px; transform:translateX(-50%);
-        background:radial-gradient(ellipse at 50% 0%, rgba(255,200,120,.35), transparent 70%); }
+        /* ══════════ TABLAS ══════════ */
+        .erp-table { width:100%; border-collapse:separate; border-spacing:0; border:3px solid var(--clr-ink);
+            border-radius:6px; overflow:hidden; box-shadow:var(--shadow-md); }
+        .erp-table thead th { background:var(--clr-ink); color:var(--clr-royal); font-family:'Bevan',serif; font-weight:400;
+            letter-spacing:.04em; padding:.75rem 1rem; border-bottom:4px solid var(--clr-royal); }
+        .erp-table tbody td { background:var(--clr-surface); padding:.65rem 1rem; border-bottom:1px dashed var(--clr-border); font-size:.92rem; }
+        .erp-table tbody tr:nth-child(even) td { background:var(--clr-ice); }
+        .erp-table tbody tr:hover td { background:rgba(255,179,71,.22); }
+        .erp-table tfoot td { background:var(--clr-cream); color:var(--clr-gold); font-weight:800; border-top:3px solid var(--clr-ink); }
 
-    /* Foco de luz que sigue al cursor */
-    .cafe-spot { position:absolute; inset:0;
-        background:radial-gradient(circle 320px at var(--mx,50%) var(--my,30%), rgba(255,210,140,.20), transparent 70%);
-        mix-blend-mode:screen; transition:background .15s linear; }
+        /* ══════════ BOTONES ══════════ */
+        .btn-erp-primary,.btn-erp-gold,.btn-erp-danger { border:2.5px solid var(--clr-ink); border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink);
+            padding:.42rem 1.3rem; font-weight:700; font-size:.9rem; cursor:pointer; text-decoration:none; display:inline-block;
+            transition:transform .12s,box-shadow .12s,background .15s; }
+        .btn-erp-primary:hover,.btn-erp-gold:hover,.btn-erp-danger:hover { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--clr-ink); }
+        .btn-erp-primary { background:var(--clr-royal); color:var(--clr-ink); }
+        .btn-erp-primary:hover { background:var(--clr-amber); color:var(--clr-ink); }
+        .btn-erp-gold { background:#F1E4C8; color:var(--clr-ink); }
+        .btn-erp-gold:hover { background:#fff3d6; color:var(--clr-ink); }
+        .btn-erp-danger { background:#C0391B; color:#FFF6DC; }
+        .btn-erp-danger:hover { background:#9C2E15; color:#FFF6DC; }
+        .btn-erp-sm { padding:.2rem .75rem; font-size:.8rem; box-shadow:2px 2px 0 var(--clr-ink); }
 
-    .estante { position:absolute; left:-2%; right:-2%; height:120px; opacity:.9;
-        translate:calc(var(--px,0) * -12px) calc(var(--py,0) * -8px); transition:translate .5s ease-out;
-        background:repeating-linear-gradient(90deg,
-            #B8431A 0 46px, #15202c 46px 48px,
-            #E5A32B 48px 92px, #15202c 92px 94px,
-            #2F5D7A 94px 136px, #15202c 136px 138px,
-            #7B3FA0 138px 176px, #15202c 176px 178px,
-            #F1E4C8 178px 224px, #15202c 224px 226px,
-            #6B8E4E 226px 262px, #15202c 262px 264px,
-            #D98AA8 264px 300px, #15202c 300px 302px,
-            #3A3A4A 302px 340px, #15202c 340px 342px); }
-    .estante::after { content:""; position:absolute; left:0; right:0; bottom:-16px; height:16px;
-        background:linear-gradient(#8a5530,#3e2010); box-shadow:0 8px 12px rgba(0,0,0,.55); }
-    .estante.e1 { top:7%; }
-    .estante.e2 { top:31%; }
+        /* ══════════ FORMULARIOS ══════════ */
+        .erp-label { font-family:'Special Elite',monospace; font-size:.95rem; color:var(--clr-muted); display:block; margin-bottom:.25rem; }
+        .erp-input { background:var(--clr-surface); border:2.5px solid var(--clr-ink); border-radius:4px; color:var(--clr-text);
+            padding:.5rem .9rem; width:100%; font-size:.95rem; }
+        .erp-input:focus { outline:none; border-color:var(--clr-royal); box-shadow:0 0 0 4px rgba(255,179,71,.4); }
 
-    .vdisco { position:absolute; width:170px; height:170px; border-radius:50%; border:3px solid #000;
-        background:radial-gradient(circle,var(--c1) 0 20%,#000 21% 23%,transparent 24%),
-                   conic-gradient(from 30deg,rgba(255,255,255,.1),transparent 15%,transparent 50%,rgba(255,255,255,.08) 60%,transparent 75%),
-                   repeating-radial-gradient(circle,#141414 0 2px,#262626 3px 4px);
-        box-shadow:4px 6px 12px rgba(0,0,0,.6);
-        translate:calc(var(--px,0) * -30px) calc(var(--py,0) * -20px); transition:translate .6s ease-out; }
-    .vdisco.d1 { --c1:#B8431A; left:-50px; top:52%; transform:rotate(-12deg); }
-    .vdisco.d2 { --c1:#7B3FA0; right:-60px; top:24%; transform:rotate(18deg); width:200px; height:200px; }
-    .vdisco.d3 { --c1:#2F5D7A; right:4%; top:56%; transform:rotate(-6deg); width:130px; height:130px; }
+        /* ══════════ BADGES / ALERTAS ══════════ */
+        .badge-erp-active,.badge-erp-inactive,.badge-erp-gold { border:2px solid var(--clr-ink); font-family:'Special Elite',monospace;
+            font-size:.78rem; padding:.12rem .7rem; border-radius:4px; color:var(--clr-ink); }
+        .badge-erp-active{background:#9BCB6B} .badge-erp-inactive{background:#FF9A7A} .badge-erp-gold{background:var(--clr-royal)}
+        .erp-alert-danger,.erp-alert-info,.erp-alert-success { border:2.5px solid var(--clr-ink); border-radius:6px;
+            box-shadow:var(--shadow-sm); padding:.9rem 1.25rem; color:var(--clr-ink); }
+        .erp-alert-danger{background:#FF9A7A} .erp-alert-info{background:#FFC56E} .erp-alert-success{background:#9BCB6B}
 
-    .cafe-barra { position:absolute; left:0; right:0; bottom:0; height:21%;
-        background:repeating-linear-gradient(90deg,rgba(0,0,0,.14) 0 2px,transparent 2px 60px),
-                   linear-gradient(#9a5e30,#5a3218 45%,#2a1608);
-        border-top:8px solid #C07A3E; box-shadow:inset 0 10px 18px rgba(0,0,0,.45), 0 -6px 18px rgba(0,0,0,.5); }
+        /* ══════════ TÍTULO DE PÁGINA ══════════ */
+        .erp-page-title { display:flex; align-items:center; gap:1rem; margin-bottom:1.75rem; padding-bottom:.75rem; border-bottom:3px dashed var(--clr-border); }
+        .erp-page-title::before { content:""; flex-shrink:0; width:46px; height:46px; border-radius:50%; border:2px solid #000;
+            background:radial-gradient(circle,var(--clr-royal) 0 22%,#000 23% 26%,transparent 27%),repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px);
+            animation:gira 6s linear infinite; }
+        .erp-page-title h2 { font-family:'Bevan',serif; font-weight:400; font-size:2.3rem; line-height:1.1; color:var(--clr-title); margin:0; }
+        [data-theme="dark"] .erp-page-title h2 { text-shadow:2px 2px 0 var(--clr-ink); }
 
-    .taza { position:absolute; bottom:calc(21% - 2px); width:52px; height:34px; background:#F1E4C8;
-        border:3px solid #2a1206; border-radius:0 0 26px 26px; box-shadow:0 4px 6px rgba(0,0,0,.5); }
-    .taza::before { content:""; position:absolute; top:4px; left:4px; right:4px; height:6px; border-radius:50%; background:#5a2e14; }
-    .taza::after { content:""; position:absolute; right:-14px; top:6px; width:12px; height:14px;
-        border:3px solid #2a1206; border-left:none; border-radius:0 10px 10px 0; }
-    .taza.t1 { left:12%; }
-    .taza.t2 { left:19%; transform:scale(.85); }
-    .taza.t3 { right:14%; }
+        code,.mono { font-family:'Special Elite',monospace; font-size:.88em; color:var(--clr-code); background:rgba(14,8,5,.3); padding:.1em .4em; border-radius:4px; }
 
-    @media (max-width:768px) {
-        .vdisco.d2 { width:120px; height:120px; right:-40px; }
-        .vdisco.d3 { display:none; }
-        .estante { height:80px; }
-        .estante::after { bottom:-12px; height:12px; }
-    }
-    [data-theme="light"] .cafe-fondo { opacity:.55; }
+        /* ══════════ FOOTER ══════════ */
+        .erp-footer { position:relative; z-index:3; color:rgba(241,228,200,.8); text-align:center; font-family:'Special Elite',monospace;
+            font-size:.85rem; padding:.9rem; border-top:4px solid var(--clr-royal);
+            background:repeating-linear-gradient(90deg,rgba(0,0,0,.25) 0 2px,transparent 2px 70px),var(--clr-navy); }
 
-    @media (prefers-reduced-motion: reduce) {
-        .funda:hover { transform:none; }
-        .letrero h1 .ltr { animation:none; }
-        .js-anim .vinilo { opacity:1; transform:none; transition:none; }
-        .vinilo-stage { transform:none !important; transition:none; }
-        .estante, .vdisco { translate:none; }
-    }
-</style>
-{% endblock %}
+        /* ══════════ COMPONENTES COMUNES DE PÁGINA ══════════ */
+        .pag-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+            margin-bottom:.4rem; padding-bottom:.75rem; border-bottom:3px dashed var(--clr-border); }
+        .pag-titulo { display:flex; align-items:center; gap:1rem; }
+        .pag-titulo h2 { font-family:'Bevan',serif; font-weight:400; font-size:2.3rem; line-height:1.1; color:var(--clr-title); margin:0; }
+        .pag-icono { font-size:2rem; }
+        .pag-acciones { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+        .pag-conteo { font-family:'Special Elite',monospace; color:var(--clr-muted); font-size:.95rem; margin:.4rem 0 1.5rem; }
 
-{% block content %}
-<div class="cafe-fondo" aria-hidden="true">
-    <div class="cafe-luz"></div>
-    <div class="cafe-spot"></div>
-    <div class="estante e1"></div>
-    <div class="estante e2"></div>
-    <div class="vdisco d1"></div>
-    <div class="vdisco d2"></div>
-    <div class="vdisco d3"></div>
-    <div class="cafe-barra"></div>
-    <span class="taza t1"></span>
-    <span class="taza t2"></span>
-    <span class="taza t3"></span>
-</div>
+        .buscador { background:var(--clr-surface); border:2.5px solid var(--clr-ink); border-radius:4px;
+            color:var(--clr-text); padding:.45rem .9rem; font-size:.95rem; min-width:220px; }
+        .buscador:focus { outline:none; border-color:var(--clr-royal); box-shadow:0 0 0 4px rgba(255,179,71,.4); }
 
-<div class="letrero">
-    <h1>Gio's Wax Cellar</h1>
-    <p class="apodo">«El sótano del vinilo» · discos, café y buena vibra</p>
-    <p class="sub">Sistema de gestión · UTEC Celaya · Espiral 1 W02</p>
-</div>
+        .btn-accion { font-family:inherit; font-weight:700; color:var(--clr-ink); text-decoration:none; display:inline-block;
+            background:linear-gradient(#FFD27A,#FFB347 55%,#E8962E); border:3px solid var(--clr-ink); border-radius:6px;
+            box-shadow:0 4px 0 #0E0805, 0 8px 16px rgba(0,0,0,.5); padding:.5rem 1.1rem; transition:transform .12s; }
+        .btn-accion:hover { transform:translateY(-2px); color:var(--clr-ink); }
+        .btn-accion:active { transform:translateY(3px); }
 
-<div class="caja">
-    {% for m in modulos %}
-    <div class="vinilo" data-i="{{ forloop.counter0 }}">
-        <div class="vinilo-stage">
-            <div class="disco"><div class="disco-giro"><span>{{ m.nombre }}</span></div></div>
-            <button type="button" class="funda" aria-label="Sacar el disco de {{ m.nombre }}">
-                <span class="funda-icono" aria-hidden="true">{{ m.icono }}</span>
-                <span class="funda-artista"></span>
-                <span class="funda-disco"></span>
-            </button>
-        </div>
-        <div class="etiqueta">
-            <strong>{{ m.nombre }}</strong>
-            <p>{{ m.descripcion }}</p>
-            <a href="{{ m.url }}">Entrar al módulo</a>
-        </div>
+        .estado-vacio { text-align:center; padding:3rem 1.5rem; border:3px dashed var(--clr-border); border-radius:14px; background:rgba(14,8,5,.25); }
+        .estado-vacio .disco-vacio { width:110px; height:110px; margin:0 auto 1rem; border-radius:50%; border:3px solid #000;
+            background:radial-gradient(circle,#FFB347 0 16%,#000 17% 19%,transparent 20%),
+                       repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px);
+            animation:gira 8s linear infinite; }
+        .estado-vacio h3 { font-family:'Bevan',serif; font-weight:400; color:var(--clr-title); margin:0 0 .4rem; font-size:1.6rem; }
+        .estado-vacio p { color:var(--clr-muted); margin:0 0 1.2rem; }
+
+        .grid-discos { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:2rem 1.5rem; }
+        .item-disco { text-align:center; color:var(--clr-text); text-decoration:none; }
+        .item-disco .disco-item { position:relative; width:170px; height:170px; margin:0 auto .8rem; border-radius:50%; border:3px solid #000;
+            background:radial-gradient(circle,var(--a,#FFB347) 0 26%,#000 27% 29%,transparent 30%),
+                       repeating-radial-gradient(circle,#141414 0 2px,#262626 3px 4px);
+            box-shadow:4px 6px 12px rgba(0,0,0,.6); }
+        .item-disco:hover .disco-item { animation:gira 1.6s linear infinite; }
+        .item-disco h3 { font-family:'Bevan',serif; font-weight:400; font-size:1.1rem; margin:0; color:var(--clr-title); }
+        .item-disco .precio { font-family:'Special Elite',monospace; font-size:.95rem; margin:.2rem 0 .4rem; }
+        .etiq-estado { display:inline-block; font-family:'Special Elite',monospace; font-size:.75rem; padding:.1rem .6rem;
+            border:2px solid var(--clr-ink); border-radius:4px; color:var(--clr-ink); }
+        .etiq-estado.on { background:#9BCB6B; }
+        .etiq-estado.off { background:#FF9A7A; }
+        .item-disco.oculto { display:none; }
+        .sin-resultados { display:none; text-align:center; color:var(--clr-muted); margin-top:2rem; font-family:'Special Elite',monospace; }
+        .sin-resultados.show { display:block; }
+
+        @media (max-width:576px) {
+            .pag-titulo h2 { font-size:1.7rem; }
+            .buscador { min-width:0; width:100%; }
+            .item-disco .disco-item { width:140px; height:140px; }
+        }
+
+        /* ══════════ TOCADISCOS · ESTRUCTURA GENERAL (el dibujo está en partials/tocadiscos.html) ══════════ */
+        .tt { position:fixed; inset:0; z-index:2000; background:rgba(10,6,3,.85); display:flex; align-items:center; justify-content:center;
+            padding:14px; opacity:0; pointer-events:none; transition:opacity .3s; }
+        .tt.open { opacity:1; pointer-events:auto; }
+        .tt-box { width:min(460px,100%); max-height:94vh; overflow-y:auto; background:var(--clr-navy); color:#F1E4C8;
+            border:3px solid var(--clr-ink); border-radius:14px; box-shadow:0 12px 0 var(--clr-ink); padding:18px;
+            text-align:center; font-family:'Special Elite',monospace; }
+        .tt-box h2 { font-family:'Bevan',serif; font-weight:400; color:#FFB347; margin:0 0 12px; font-size:1.3rem; }
+        .tt-etiq { position:absolute; left:50%; top:50%; width:38%; height:38%; transform:translate(-50%,-50%); border-radius:50%;
+            border:3px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
+        #ttSpot iframe { display:block; width:100%; height:152px; border:0; border-radius:12px; margin-top:14px; }
+        .tt .btn { font-family:inherit; font-weight:700; background:#FFB347; color:var(--clr-ink); border:3px solid var(--clr-ink);
+            border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink); padding:.45rem .9rem; margin:.4rem .2rem 0; cursor:pointer; }
+        .tt .btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--clr-ink); }
+        .tt-picker { display:none; gap:12px; overflow-x:auto; padding:12px 6px; margin-top:10px; }
+        .tt-picker.show { display:flex; }
+        .pick { flex:0 0 92px; cursor:pointer; font-size:.7rem; text-align:center; color:#F1E4C8; }
+        .disco-mini { position:relative; width:84px; height:84px; margin:0 auto 6px; border-radius:50%; border:2px solid #000;
+            background:repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px); transition:transform .4s; }
+        .pick:hover .disco-mini { transform:rotate(45deg); }
+        .pick.act .disco-mini { outline:3px solid #FFB347; outline-offset:2px; }
+        .disco-mini .etiq { position:absolute; left:50%; top:50%; width:40%; height:40%; transform:translate(-50%,-50%); border-radius:50%;
+            border:2px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
+        .volador { position:fixed; width:40px; height:40px; border-radius:50%; border:2px solid #000; pointer-events:none; z-index:2100; }
+
+        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco,.tt-surco,.estado-vacio .disco-vacio { animation:none; } * { transition:none !important; } }
+        @media (max-width:576px) { .erp-page-title h2 { font-size:1.7rem; } }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<nav class="erp-navbar">
+    <a class="erp-brand" href="/"><span class="mini-disco" aria-hidden="true"></span>
+        <span>Gio's Wax Cellar <small>· el sótano del vinilo</small></span></a>
+    <div class="erp-nav-links">
+        {% url 'reportes:inicio' as rep_inicio %}
+        {% url 'reportes:lista' as rep_lista %}
+        {% url 'reportes:dashboard' as rep_dash %}
+        {% url 'reportes:index' as rep_index %}
+
+        <a href="{% url 'productos:lista' %}" class="erp-nav-link {% block nav_productos %}{% endblock %}">Productos</a>
+        <a href="{% url 'clientes:lista' %}" class="erp-nav-link {% block nav_clientes %}{% endblock %}">Clientes</a>
+        <a href="{% url 'proveedores:lista' %}" class="erp-nav-link {% block nav_proveedores %}{% endblock %}">Proveedores</a>
+        <a href="{% url 'ventas:lista' %}" class="erp-nav-link {% block nav_ventas %}{% endblock %}">Ventas</a>
+        <a href="{{ rep_inicio|default:rep_lista|default:rep_dash|default:rep_index|default:'#' }}" class="erp-nav-link {% block nav_reportes %}{% endblock %}">Reportes</a>
+        <a href="/admin/" class="erp-nav-link">Admin</a>
+        {% if user.is_authenticated %}
+            <a href="/accounts/logout/" class="erp-nav-link">Salir ({{ user.username }})</a>
+        {% else %}
+            <a href="/accounts/login/" class="erp-nav-link">Entrar</a>
+        {% endif %}
+        <button class="theme-toggle" id="themeBtn" title="Modo día/noche">☀️</button>
     </div>
-    {% empty %}
-    {% url 'reportes:inicio' as rep_inicio %}{% url 'reportes:lista' as rep_lista %}{% url 'reportes:dashboard' as rep_dash %}{% url 'reportes:index' as rep_index %}
-    <div class="vinilo" data-i="0">
-        <div class="vinilo-stage">
-            <div class="disco"><div class="disco-giro"><span>Productos</span></div></div>
-            <button type="button" class="funda" aria-label="Sacar el disco de Productos">
-                <span class="funda-icono" aria-hidden="true">💿</span>
-                <span class="funda-artista"></span>
-                <span class="funda-disco"></span>
-            </button>
-        </div>
-        <div class="etiqueta">
-            <strong>Productos</strong>
-            <p>Catálogo de discos y artículos</p>
-            <a href="{% url 'productos:lista' %}">Entrar al módulo</a>
-        </div>
-    </div>
-    <div class="vinilo" data-i="1">
-        <div class="vinilo-stage">
-            <div class="disco"><div class="disco-giro"><span>Clientes</span></div></div>
-            <button type="button" class="funda" aria-label="Sacar el disco de Clientes">
-                <span class="funda-icono" aria-hidden="true">🎧</span>
-                <span class="funda-artista"></span>
-                <span class="funda-disco"></span>
-            </button>
-        </div>
-        <div class="etiqueta">
-            <strong>Clientes</strong>
-            <p>Coleccionistas y compradores</p>
-            <a href="{% url 'clientes:lista' %}">Entrar al módulo</a>
-        </div>
-    </div>
-    <div class="vinilo" data-i="2">
-        <div class="vinilo-stage">
-            <div class="disco"><div class="disco-giro"><span>Proveedores</span></div></div>
-            <button type="button" class="funda" aria-label="Sacar el disco de Proveedores">
-                <span class="funda-icono" aria-hidden="true">🚚</span>
-                <span class="funda-artista"></span>
-                <span class="funda-disco"></span>
-            </button>
-        </div>
-        <div class="etiqueta">
-            <strong>Proveedores</strong>
-            <p>Distribuidores y sellos</p>
-            <a href="{% url 'proveedores:lista' %}">Entrar al módulo</a>
-        </div>
-    </div>
-    <div class="vinilo" data-i="3">
-        <div class="vinilo-stage">
-            <div class="disco"><div class="disco-giro"><span>Ventas</span></div></div>
-            <button type="button" class="funda" aria-label="Sacar el disco de Ventas">
-                <span class="funda-icono" aria-hidden="true">🧾</span>
-                <span class="funda-artista"></span>
-                <span class="funda-disco"></span>
-            </button>
-        </div>
-        <div class="etiqueta">
-            <strong>Ventas</strong>
-            <p>Caja y tickets de la tienda</p>
-            <a href="{% url 'ventas:lista' %}">Entrar al módulo</a>
-        </div>
-    </div>
-    <div class="vinilo" data-i="4">
-        <div class="vinilo-stage">
-            <div class="disco"><div class="disco-giro"><span>Reportes</span></div></div>
-            <button type="button" class="funda" aria-label="Sacar el disco de Reportes">
-                <span class="funda-icono" aria-hidden="true">📈</span>
-                <span class="funda-artista"></span>
-                <span class="funda-disco"></span>
-            </button>
-        </div>
-        <div class="etiqueta">
-            <strong>Reportes</strong>
-            <p>Lo más vendido del sótano</p>
-            <a href="{{ rep_inicio|default:rep_lista|default:rep_dash|default:rep_index|default:'#' }}">Entrar al módulo</a>
-        </div>
-    </div>
-    <div class="vinilo" data-i="5">
-        <div class="vinilo-stage">
-            <div class="disco"><div class="disco-giro"><span>Admin</span></div></div>
-            <button type="button" class="funda" aria-label="Sacar el disco de Admin">
-                <span class="funda-icono" aria-hidden="true">🔑</span>
-                <span class="funda-artista"></span>
-                <span class="funda-disco"></span>
-            </button>
-        </div>
-        <div class="etiqueta">
-            <strong>Admin</strong>
-            <p>Trastienda de Gio</p>
-            <a href="/admin/">Entrar al módulo</a>
-        </div>
+</nav>
+
+<div class="focos" id="focos" aria-hidden="true"></div>
+
+{% if messages %}
+<div class="container mt-4" style="position:relative;z-index:1;">
+    {% for m in messages %}
+    <div class="erp-alert-{% if m.tags == 'error' %}danger{% elif m.tags == 'success' %}success{% else %}info{% endif %} d-flex justify-content-between align-items-center mb-2" role="alert">
+        <span>{{ m }}</span>
+        <button onclick="this.parentElement.style.display='none'" aria-label="Cerrar"
+                style="background:none;border:none;cursor:pointer;font-size:1.2rem;font-weight:800;color:inherit;">×</button>
     </div>
     {% endfor %}
 </div>
-{% endblock %}
+{% endif %}
 
-{% block extra_js %}
+<main class="erp-main">
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+<footer class="erp-footer">
+    Gio's Wax Cellar · ERP Django 4.2 LTS · UTEC Celaya · Espiral 1 · Hecho por Gio
+</footer>
+
+<!-- Tocadiscos (disponible en todas las páginas) -->
+{% include "partials/tocadiscos.html" %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Focos colgantes -->
 <script>
 (function () {
-    /* ═══════════ TUS VINILOS ═══════════
-       Un vinilo por módulo, en orden.
-       - artista / disco : lo que se ve en la portada.
-       - img             : imagen dentro de static/img/ (opcional).
-       - embed           : enlace de inserción de Spotify (/embed/track/...).
-       - a, b, c         : colores de la portada y del centro del disco. */
-    var VINILOS = [
-        { artista:'Sabrina Carpenter', disco:'Edición Gio #1', img:'{% static "img/edicion1.jpg" %}', embed:'https://open.spotify.com/embed/track/2LU2CYKUZUc1iAErxJb1dK', a:'#F0B547', b:'#FFF6DC', c:'#B8431A' },
-        { artista:'Olivia Rodrigo',    disco:'Edición Gio #2', img:'{% static "img/edicion2.jpg" %}', embed:'https://open.spotify.com/embed/track/5Jh1i0no3vJ9u4deXkb4aV', a:'#7B3FA0', b:'#F4A6D7', c:'#2A1240' },
-        { artista:'Tate McRae',        disco:'Edición Gio #3', img:'{% static "img/edicion3.jpg" %}', embed:'https://open.spotify.com/embed/track/2sFepQNyl1WjpROruP8bJ0', a:'#3A3A4A', b:'#E8D8C0', c:'#0E0E16' },
-        { artista:'Adele',             disco:'Edición Gio #4', img:'{% static "img/edicion4.jpg" %}', embed:'https://open.spotify.com/embed/track/70cHKK8bHAfJrOGVnfRG9J', a:'#2F5D7A', b:'#F1E4C8', c:'#0E2233' },
-        { artista:'Ariana Grande',     disco:'Edición Gio #5', img:'{% static "img/edicion5.jpg" %}', embed:'https://open.spotify.com/embed/track/6Im9k8u9iIzKMrmV7BWtlF', a:'#D98AA8', b:'#FFF1F5', c:'#6A2D47' },
-        { artista:'Malcolm Todd',      disco:'Edición Gio #6', img:'{% static "img/edicion6.jpg" %}', embed:'https://open.spotify.com/embed/track/59c2xv2kMzYM6HR9oY6BIa', a:'#6B8E4E', b:'#F1E4C8', c:'#1F2E14' }
-    ];
+    var cont = document.getElementById('focos');
+    if (!cont) return;
+    var n = Math.max(4, Math.round(window.innerWidth / 190));
+    for (var i = 0; i < n; i++) {
+        var f = document.createElement('span');
+        f.className = 'foco';
+        f.style.left = ((i + .5) * 100 / n + (Math.random() * 4 - 2)).toFixed(1) + '%';
+        f.style.height = (28 + Math.random() * 46).toFixed(0) + 'px';
+        f.style.animationDelay = (-Math.random() * 6).toFixed(1) + 's';
+        cont.appendChild(f);
+    }
+})();
+</script>
 
-    var ov = document.getElementById('tt');
-    var ttTitulo = document.getElementById('ttTitulo');
-    var ttEtiq = document.getElementById('ttEtiq');
-    var ttSpot = document.getElementById('ttSpot');
-    var ttPicker = document.getElementById('ttPicker');
-    var ttGirar = document.getElementById('ttGirar');
-
-    /* ── Portadas de la caja ── */
-    document.querySelectorAll('.vinilo').forEach(function (el, i) {
-        var v = VINILOS[i % VINILOS.length];
-        var funda = el.querySelector('.funda');
-        el.style.setProperty('--a', v.a); el.style.setProperty('--b', v.b); el.style.setProperty('--c', v.c);
-        el.querySelector('.funda-artista').textContent = v.artista;
-        el.querySelector('.funda-disco').textContent = v.disco;
-        if (v.img) funda.style.backgroundImage = 'url(' + v.img + ')';
-        funda.addEventListener('click', function () { abrir(i); });
+<!-- Modo día/noche -->
+<script>
+(function () {
+    var btn = document.getElementById('themeBtn'), html = document.documentElement;
+    var icons = { dark: '☀️', light: '🌙' }, saved = 'dark';
+    try { saved = localStorage.getItem('erpTheme') || 'dark'; } catch (e) {}
+    html.setAttribute('data-theme', saved);
+    if (!btn) return;
+    btn.textContent = icons[saved];
+    btn.addEventListener('click', function () {
+        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        btn.textContent = icons[next];
+        try { localStorage.setItem('erpTheme', next); } catch (e) {}
     });
+})();
+</script>
 
-    /* ── Selector de vinilos ── */
-    VINILOS.forEach(function (v, i) {
-        var p = document.createElement('div');
-        p.className = 'pick';
-        p.innerHTML = '<div class="disco-mini"><span class="etiq"></span></div>' + v.artista;
-        p.style.setProperty('--a', v.a);
-        p.style.setProperty('--c', v.c);
-        if (v.img) p.querySelector('.etiq').style.backgroundImage = 'url(' + v.img + ')';
-        p.addEventListener('click', function () { abrir(i); });
-        ttPicker.appendChild(p);
-    });
-
-    function marcarPicker(i) {
-        ttPicker.querySelectorAll('.pick').forEach(function (p, idx) {
-            p.classList.toggle('act', idx === i);
-        });
-    }
-
-    function actualizarBoton() {
-        ttGirar.textContent = ov.classList.contains('playing') ? '⏸ Pausa' : '⏵ Girar';
-    }
-
-    /* ── Abrir / cerrar tocadiscos ── */
-    function abrir(i) {
-        var v = VINILOS[i];
-        ov.style.setProperty('--a', v.a);
-        ov.style.setProperty('--c', v.c);
-        ttTitulo.textContent = v.artista + ' · ' + v.disco;
-        ttEtiq.style.backgroundImage = v.img ? 'url(' + v.img + ')' : '';
-
-        ttSpot.innerHTML = '';
-        if (v.embed) {
-            var f = document.createElement('iframe');
-            f.src = v.embed;
-            f.title = 'Spotify: ' + v.artista;
-            f.allow = 'autoplay; clipboard-write; encrypted-media; picture-in-picture';
-            f.loading = 'lazy';
-            ttSpot.appendChild(f);
-        }
-
-        marcarPicker(i);
-        ov.classList.remove('playing');
-        ov.classList.add('open');
-        setTimeout(function () { ov.classList.add('playing'); actualizarBoton(); }, 900);
-        actualizarBoton();
-    }
-
-    function cerrar() {
-        ov.classList.remove('open', 'playing');
-        ttSpot.innerHTML = '';
-        ttPicker.classList.remove('show');
-        actualizarBoton();
-    }
-
-    ttGirar.addEventListener('click', function () {
-        ov.classList.toggle('playing');
-        actualizarBoton();
-    });
-    document.getElementById('ttElegir').addEventListener('click', function () {
-        ttPicker.classList.toggle('show');
-    });
-    document.getElementById('ttNormal').addEventListener('click', cerrar);
-    ov.addEventListener('click', function (e) { if (e.target === ov) cerrar(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrar(); });
-
-    /* ── Vinilos volando al abrir un módulo ── */
-    function volar(el, color) {
-        var r = el.getBoundingClientRect();
-        for (var k = 0; k < 14; k++) {
-            var d = document.createElement('div');
-            d.className = 'volador';
-            d.style.background = 'radial-gradient(circle,' + color + ' 0 25%,#0b0b0b 26%,#222 60%,#0b0b0b 100%)';
-            d.style.left = (r.left + r.width / 2 - 20) + 'px';
-            d.style.top = (r.top + r.height / 2 - 20) + 'px';
-            document.body.appendChild(d);
-
-            var dx = (Math.random() - 0.5) * window.innerWidth * 0.9;
-            var dy = -(Math.random() * window.innerHeight * 0.6 + 120);
-            d.animate([
-                { transform: 'translate(0,0) rotate(0deg) scale(.6)', opacity: 1 },
-                { transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(900deg) scale(1)', opacity: 0 }
-            ], { duration: 1100 + Math.random() * 600, delay: k * 60, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' })
-              .onfinish = (function (node) { return function () { node.remove(); }; })(d);
-        }
-    }
-
-    document.querySelectorAll('.vinilo .etiqueta a').forEach(function (a) {
-        a.addEventListener('click', function (e) {
-            var href = a.getAttribute('href');
-            if (!href || href === '#') return;
-            e.preventDefault();
-            var el = a.closest('.vinilo');
-            var v = VINILOS[+el.dataset.i % VINILOS.length];
-            volar(a, v.a);
-            setTimeout(function () { window.location.href = href; }, 900);
-        });
-    });
-
-    /* ═══════════ ANIMACIONES INTERACTIVAS ═══════════ */
-    var root = document.documentElement;
-    root.classList.add('js-anim');
-
-    /* 1. Título: cada letra cae en secuencia */
-    var h1 = document.querySelector('.letrero h1');
-    if (h1) {
-        var texto = h1.textContent;
-        h1.textContent = '';
-        h1.setAttribute('aria-label', texto);
-        Array.prototype.forEach.call(texto, function (ch, i) {
-            var s = document.createElement('span');
-            s.className = 'ltr';
-            s.setAttribute('aria-hidden', 'true');
-            s.textContent = ch === ' ' ? '\u00A0' : ch;
-            s.style.animationDelay = (i * 0.06) + 's';
-            h1.appendChild(s);
-        });
-    }
-
-    /* 2. Portadas: aparecen al hacer scroll */
-    var vinilos = document.querySelectorAll('.vinilo');
-    if ('IntersectionObserver' in window) {
-        var io = new IntersectionObserver(function (entradas) {
-            entradas.forEach(function (en) {
-                if (en.isIntersecting) {
-                    en.target.classList.add('visible');
-                    io.unobserve(en.target);
-                }
+<!-- Buscador común: cualquier input con data-buscar="id-de-la-cuadrícula" filtra esa cuadrícula -->
+<script>
+(function () {
+    document.querySelectorAll('[data-buscar]').forEach(function (input) {
+        var grid = document.getElementById(input.dataset.buscar);
+        if (!grid) return;
+        var sin = document.querySelector('[data-sin-de="' + input.dataset.buscar + '"]');
+        input.addEventListener('input', function () {
+            var q = input.value.trim().toLowerCase(), visibles = 0;
+            grid.querySelectorAll('.item-disco').forEach(function (el) {
+                var ok = (el.dataset.texto || '').indexOf(q) !== -1;
+                el.classList.toggle('oculto', !ok);
+                if (ok) visibles++;
             });
-        }, { threshold: 0.15 });
-        vinilos.forEach(function (el, i) {
-            el.style.transitionDelay = ((i % 3) * 0.08) + 's';
-            io.observe(el);
-        });
-    } else {
-        vinilos.forEach(function (el) { el.classList.add('visible'); });
-    }
-
-    /* Lo siguiente solo se activa si el usuario no pidió reducir animaciones */
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    /* 3. Mouse: paralaje del fondo y foco de luz */
-    document.addEventListener('mousemove', function (e) {
-        root.style.setProperty('--px', (e.clientX / window.innerWidth - 0.5).toFixed(3));
-        root.style.setProperty('--py', (e.clientY / window.innerHeight - 0.5).toFixed(3));
-        root.style.setProperty('--mx', e.clientX + 'px');
-        root.style.setProperty('--my', e.clientY + 'px');
-    });
-
-    /* 4. Portadas: se inclinan hacia el cursor */
-    vinilos.forEach(function (el) {
-        var stage = el.querySelector('.vinilo-stage');
-        el.addEventListener('mousemove', function (e) {
-            var r = el.getBoundingClientRect();
-            var x = (e.clientX - r.left) / r.width - 0.5;
-            var y = (e.clientY - r.top) / r.height - 0.5;
-            stage.style.setProperty('--rx', (-y * 14).toFixed(2) + 'deg');
-            stage.style.setProperty('--ry', (x * 14).toFixed(2) + 'deg');
-        });
-        el.addEventListener('mouseleave', function () {
-            stage.style.setProperty('--rx', '0deg');
-            stage.style.setProperty('--ry', '0deg');
+            if (sin) sin.classList.toggle('show', visibles === 0);
         });
     });
 })();
 </script>
-{% endblock %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
