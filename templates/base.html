@@ -68,8 +68,8 @@
             border-radius:50%; width:34px; height:34px; cursor:pointer; margin-left:.4rem; box-shadow:2px 2px 0 var(--clr-ink); }
         .theme-toggle:hover { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--clr-ink); }
 
-        /* ══════════ FOCOS ══════════ */
-        .focos { position:relative; z-index:4; height:0; pointer-events:none; }
+        /* ══════════ FOCOS (detrás del contenido) ══════════ */
+        .focos { position:relative; z-index:0; height:0; pointer-events:none; }
         .foco { position:absolute; top:0; width:2px; background:#0E0805; transform-origin:top; animation:mece 6s ease-in-out infinite; }
         .foco::after { content:""; position:absolute; left:50%; bottom:-14px; width:16px; height:20px; transform:translateX(-50%);
             border-radius:50% 50% 45% 45%; background:radial-gradient(circle at 50% 35%,#FFF3C4,#FFB347 70%);
@@ -138,6 +138,58 @@
             font-size:.85rem; padding:.9rem; border-top:4px solid var(--clr-royal);
             background:repeating-linear-gradient(90deg,rgba(0,0,0,.25) 0 2px,transparent 2px 70px),var(--clr-navy); }
 
+        /* ══════════ COMPONENTES COMUNES DE PÁGINA ══════════ */
+        .pag-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+            margin-bottom:.4rem; padding-bottom:.75rem; border-bottom:3px dashed var(--clr-border); }
+        .pag-titulo { display:flex; align-items:center; gap:1rem; }
+        .pag-titulo h2 { font-family:'Bevan',serif; font-weight:400; font-size:2.3rem; line-height:1.1; color:var(--clr-title); margin:0; }
+        .pag-icono { font-size:2rem; }
+        .pag-acciones { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+        .pag-conteo { font-family:'Special Elite',monospace; color:var(--clr-muted); font-size:.95rem; margin:.4rem 0 1.5rem; }
+
+        .buscador { background:var(--clr-surface); border:2.5px solid var(--clr-ink); border-radius:4px;
+            color:var(--clr-text); padding:.45rem .9rem; font-size:.95rem; min-width:220px; }
+        .buscador:focus { outline:none; border-color:var(--clr-royal); box-shadow:0 0 0 4px rgba(255,179,71,.4); }
+
+        .btn-accion { font-family:inherit; font-weight:700; color:var(--clr-ink); text-decoration:none; display:inline-block;
+            background:linear-gradient(#FFD27A,#FFB347 55%,#E8962E); border:3px solid var(--clr-ink); border-radius:6px;
+            box-shadow:0 4px 0 #0E0805, 0 8px 16px rgba(0,0,0,.5); padding:.5rem 1.1rem; transition:transform .12s; }
+        .btn-accion:hover { transform:translateY(-2px); color:var(--clr-ink); }
+        .btn-accion:active { transform:translateY(3px); }
+
+        /* Estado vacío */
+        .estado-vacio { text-align:center; padding:3rem 1.5rem; border:3px dashed var(--clr-border); border-radius:14px; background:rgba(14,8,5,.25); }
+        .estado-vacio .disco-vacio { width:110px; height:110px; margin:0 auto 1rem; border-radius:50%; border:3px solid #000;
+            background:radial-gradient(circle,#FFB347 0 16%,#000 17% 19%,transparent 20%),
+                       repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px);
+            animation:gira 8s linear infinite; }
+        .estado-vacio h3 { font-family:'Bevan',serif; font-weight:400; color:var(--clr-title); margin:0 0 .4rem; font-size:1.6rem; }
+        .estado-vacio p { color:var(--clr-muted); margin:0 0 1.2rem; }
+
+        /* Cuadrícula de discos */
+        .grid-discos { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:2rem 1.5rem; }
+        .item-disco { text-align:center; color:var(--clr-text); text-decoration:none; }
+        .item-disco .disco-item { position:relative; width:170px; height:170px; margin:0 auto .8rem; border-radius:50%; border:3px solid #000;
+            background:radial-gradient(circle,var(--a,#FFB347) 0 26%,#000 27% 29%,transparent 30%),
+                       repeating-radial-gradient(circle,#141414 0 2px,#262626 3px 4px);
+            box-shadow:4px 6px 12px rgba(0,0,0,.6); }
+        .item-disco:hover .disco-item { animation:gira 1.6s linear infinite; }
+        .item-disco h3 { font-family:'Bevan',serif; font-weight:400; font-size:1.1rem; margin:0; color:var(--clr-title); }
+        .item-disco .precio { font-family:'Special Elite',monospace; font-size:.95rem; margin:.2rem 0 .4rem; }
+        .etiq-estado { display:inline-block; font-family:'Special Elite',monospace; font-size:.75rem; padding:.1rem .6rem;
+            border:2px solid var(--clr-ink); border-radius:4px; color:var(--clr-ink); }
+        .etiq-estado.on { background:#9BCB6B; }
+        .etiq-estado.off { background:#FF9A7A; }
+        .item-disco.oculto { display:none; }
+        .sin-resultados { display:none; text-align:center; color:var(--clr-muted); margin-top:2rem; font-family:'Special Elite',monospace; }
+        .sin-resultados.show { display:block; }
+
+        @media (max-width:576px) {
+            .pag-titulo h2 { font-size:1.7rem; }
+            .buscador { min-width:0; width:100%; }
+            .item-disco .disco-item { width:140px; height:140px; }
+        }
+
         /* ══════════ TOCADISCOS · ESTRUCTURA GENERAL (el dibujo está en partials/tocadiscos.html) ══════════ */
         .tt { position:fixed; inset:0; z-index:2000; background:rgba(10,6,3,.85); display:flex; align-items:center; justify-content:center;
             padding:14px; opacity:0; pointer-events:none; transition:opacity .3s; }
@@ -163,7 +215,7 @@
             border:2px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
         .volador { position:fixed; width:40px; height:40px; border-radius:50%; border:2px solid #000; pointer-events:none; z-index:2100; }
 
-        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco { animation:none; } * { transition:none !important; } }
+        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco,.tt-surco,.estado-vacio .disco-vacio { animation:none; } * { transition:none !important; } }
         @media (max-width:576px) { .erp-page-title h2 { font-size:1.7rem; } }
     </style>
     {% block extra_css %}{% endblock %}
@@ -258,6 +310,27 @@
     });
 })();
 </script>
+
+<!-- Buscador común: cualquier input con data-buscar="id-de-la-cuadrícula" filtra esa cuadrícula -->
+<script>
+(function () {
+    document.querySelectorAll('[data-buscar]').forEach(function (input) {
+        var grid = document.getElementById(input.dataset.buscar);
+        if (!grid) return;
+        var sin = document.querySelector('[data-sin-de="' + input.dataset.buscar + '"]');
+        input.addEventListener('input', function () {
+            var q = input.value.trim().toLowerCase(), visibles = 0;
+            grid.querySelectorAll('.item-disco').forEach(function (el) {
+                var ok = (el.dataset.texto || '').indexOf(q) !== -1;
+                el.classList.toggle('oculto', !ok);
+                if (ok) visibles++;
+            });
+            if (sin) sin.classList.toggle('show', visibles === 0);
+        });
+    });
+})();
+</script>
+
 {% block extra_js %}{% endblock %}
 </body>
 </html>
