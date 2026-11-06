@@ -1,0 +1,93 @@
+<style>
+    .tt2-deck { position:relative; width:min(440px,100%); aspect-ratio:480/330; margin:0 auto; }
+    .tt2-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+
+    .tt2-platter { position:absolute; left:8%; top:14%; width:52%; aspect-ratio:1; border-radius:50%;
+        background:radial-gradient(circle,#2a2a2a 0 55%,#121212 100%);
+        border:5px solid #b9b9b9; box-shadow:0 4px 10px rgba(0,0,0,.6), inset 0 0 0 2px #222; }
+    .tt2-platter::after { content:""; position:absolute; left:50%; top:50%; width:10px; height:10px; border-radius:50%;
+        transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 35%,#fff,#777); z-index:3; }
+
+    .tt2-disco { position:absolute; inset:4%; border-radius:50%; opacity:0; transform:translateY(-90px) scale(.92);
+        transition:transform .9s cubic-bezier(.3,1.3,.5,1), opacity .4s; }
+    .tt.open .tt2-disco { opacity:1; transform:none; }
+
+    .tt2-surco { position:absolute; inset:0; border-radius:50%; animation:gira 2.4s linear infinite; animation-play-state:paused;
+        background:
+            radial-gradient(circle,var(--a) 0 22%,#000 23% 25%,transparent 26%),
+            conic-gradient(from 20deg,rgba(255,255,255,.12),transparent 14%,transparent 50%,rgba(255,255,255,.1) 60%,transparent 72%),
+            repeating-radial-gradient(circle,#151515 0 2px,#252525 3px 4px); }
+    .tt.playing .tt2-surco { animation-play-state:running; }
+
+    .tt2-arm { position:absolute; right:15%; top:24%; width:40%; height:7px; border-radius:4px; z-index:4;
+        background:linear-gradient(#f4f4f4,#8c8c8c); box-shadow:0 2px 3px rgba(0,0,0,.4);
+        transform-origin:100% 50%; transform:rotate(20deg); transition:transform .9s ease; }
+    .tt2-arm::after { content:""; position:absolute; left:-14px; top:-4px; width:20px; height:14px; background:#1d1d1d;
+        border:1px solid #000; border-radius:3px; }
+    .tt.playing .tt2-arm { transform:rotate(-4deg); }
+
+    .tt2-pivote { position:absolute; right:calc(15% - 13px); top:calc(24% - 9.5px); width:26px; height:26px; border-radius:50%; z-index:5;
+        background:radial-gradient(circle at 35% 35%,#fff,#9a9a9a 55%,#333); box-shadow:0 2px 4px rgba(0,0,0,.5); }
+
+    @media (prefers-reduced-motion: reduce) { .tt2-surco { animation:none; } }
+</style>
+
+<div class="tt" id="tt" role="dialog" aria-modal="true" aria-labelledby="ttTitulo">
+    <div class="tt-box">
+        <h2 id="ttTitulo"></h2>
+
+        <div class="tt2-deck">
+            <svg class="tt2-svg" viewBox="0 0 480 330" aria-hidden="true">
+                <defs>
+                    <linearGradient id="tt2Madera" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#A8703D"/>
+                        <stop offset=".55" stop-color="#6B3C1C"/>
+                        <stop offset="1" stop-color="#4A2510"/>
+                    </linearGradient>
+                    <linearGradient id="tt2Acrilico" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#ffffff" stop-opacity=".45"/>
+                        <stop offset=".5" stop-color="#cfe8ff" stop-opacity=".12"/>
+                        <stop offset="1" stop-color="#ffffff" stop-opacity=".25"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- Tapa de acrílico (abierta, detrás de la base) -->
+                <rect x="30" y="4" width="420" height="110" rx="12" fill="url(#tt2Acrilico)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+                <rect x="210" y="96" width="60" height="10" rx="4" fill="#9a9a9a"/>
+
+                <!-- Base de madera -->
+                <rect x="10" y="70" width="460" height="250" rx="16" fill="url(#tt2Madera)" stroke="#2a1206" stroke-width="3"/>
+                <path d="M30 110 Q240 96 450 112 M30 150 Q240 136 450 152 M30 280 Q240 266 450 282"
+                      fill="none" stroke="rgba(0,0,0,.14)" stroke-width="2"/>
+
+                <!-- Pies -->
+                <circle cx="40" cy="322" r="8" fill="#111"/>
+                <circle cx="440" cy="322" r="8" fill="#111"/>
+
+                <!-- Hueco del plato -->
+                <circle cx="150" cy="160" r="120" fill="#0c0704"/>
+
+                <!-- LED y marca -->
+                <circle cx="34" cy="296" r="4.5" fill="#ff4a2a"/>
+                <text x="446" y="300" text-anchor="end" font-family="Bevan, serif" font-size="13" fill="#E8C9A0" letter-spacing="1">GIO'S · 33⅓</text>
+            </svg>
+
+            <div class="tt2-platter">
+                <div class="tt2-disco">
+                    <div class="tt2-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
+                </div>
+            </div>
+
+            <span class="tt2-pivote"></span>
+            <div class="tt2-arm"></div>
+        </div>
+
+        <div id="ttSpot"></div>
+        <div>
+            <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
+            <button type="button" class="btn" id="ttElegir">💿 Elegir vinilo</button>
+            <button type="button" class="btn" id="ttNormal">Vista normal</button>
+        </div>
+        <div class="tt-picker" id="ttPicker"></div>
+    </div>
+</div>

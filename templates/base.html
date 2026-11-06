@@ -6,15 +6,13 @@
     <meta name="theme-color" content="#1C100A">
     <title>{% block title %}ERP Django{% endblock %} · Gio's Wax Cellar</title>
 
-    <!-- Bevan (rótulos de tienda) + Work Sans (cuerpo) + Special Elite (etiquetas de precio) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bevan&family=Work+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        /* ══════════ TOKENS · NOCHE (sótano de ladrillo, focos ámbar) ══════════
-           Se conservan los nombres --clr-* para no romper otras plantillas. */
+        /* ══════════ TOKENS · NOCHE ══════════ */
         :root, [data-theme="dark"] {
             --clr-navy:#1C100A; --clr-royal:#FFB347; --clr-sky:#E5A32B; --clr-ice:#33200F;
             --clr-gold:#FFB347; --clr-amber:#FFC56E; --clr-cream:#44291A;
@@ -23,7 +21,7 @@
             --clr-rust:#9C3B1F; --clr-title:#FFB347; --clr-code:#FFC56E;
             --shadow-sm:3px 3px 0 var(--clr-ink); --shadow-md:6px 6px 0 var(--clr-ink);
         }
-        /* ══════════ TOKENS · DÍA (tienda con luz de ventana) ══════════ */
+        /* ══════════ TOKENS · DÍA ══════════ */
         [data-theme="light"] {
             --clr-navy:#3B2314; --clr-royal:#D9822B; --clr-sky:#F0B547; --clr-ice:#F6E6C4;
             --clr-gold:#9C3B1F; --clr-amber:#D9822B; --clr-cream:#F3DDB0;
@@ -35,19 +33,18 @@
         body {
             font-family:'Work Sans','Segoe UI',sans-serif; font-size:15.5px; line-height:1.6; margin:0;
             color:var(--clr-text); background-color:var(--clr-bg);
-            /* pared de ladrillo */
             background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='112' height='56' fill='none' stroke='%23000' stroke-opacity='.28' stroke-width='3'><path d='M0 0H112M0 28H112M0 56H112M56 0V28M0 28V56M112 28V56'/></svg>");
             background-size:112px 56px;
             transition:background-color .25s,color .25s;
         }
-        body::after { /* viñeta: luz cálida al centro */
+        body::after {
             content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
             background:radial-gradient(ellipse at 50% 30%, rgba(255,179,71,.14), rgba(0,0,0,.45) 85%);
         }
         [data-theme="light"] body::after { background:radial-gradient(ellipse at 50% 20%, rgba(255,255,255,.35), rgba(120,60,20,.22) 90%); }
         a:focus-visible, button:focus-visible, .erp-input:focus-visible { outline:3px solid var(--clr-royal); outline-offset:2px; }
 
-        /* ══════════ NAVBAR (letrero de madera) ══════════ */
+        /* ══════════ NAVBAR ══════════ */
         .erp-navbar {
             position:relative; z-index:5; padding:.7rem 1.5rem;
             display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem;
@@ -71,7 +68,7 @@
             border-radius:50%; width:34px; height:34px; cursor:pointer; margin-left:.4rem; box-shadow:2px 2px 0 var(--clr-ink); }
         .theme-toggle:hover { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--clr-ink); }
 
-        /* ══════════ FOCOS COLGANTES ══════════ */
+        /* ══════════ FOCOS ══════════ */
         .focos { position:relative; z-index:4; height:0; pointer-events:none; }
         .foco { position:absolute; top:0; width:2px; background:#0E0805; transform-origin:top; animation:mece 6s ease-in-out infinite; }
         .foco::after { content:""; position:absolute; left:50%; bottom:-14px; width:16px; height:20px; transform:translateX(-50%);
@@ -83,13 +80,13 @@
         .erp-main { position:relative; z-index:1; padding:2.5rem 0; min-height:calc(100vh - 110px); }
         .container { position:relative; z-index:1; }
 
-        /* ══════════ TARJETAS (fundas de disco) ══════════ */
+        /* ══════════ TARJETAS ══════════ */
         .erp-card { background:var(--clr-surface); border:3px solid var(--clr-ink); border-radius:6px;
             box-shadow:var(--shadow-md); padding:1.5rem; margin-bottom:1.75rem; }
         .erp-card-header { background:var(--clr-royal); color:var(--clr-ink); border-bottom:3px solid var(--clr-ink);
             border-radius:3px 3px 0 0; padding:.6rem 1.25rem; font-family:'Bevan',serif; font-size:1.2rem; margin:-1.5rem -1.5rem 1.5rem; }
 
-        /* ══════════ TABLAS (lista de precios) ══════════ */
+        /* ══════════ TABLAS ══════════ */
         .erp-table { width:100%; border-collapse:separate; border-spacing:0; border:3px solid var(--clr-ink);
             border-radius:6px; overflow:hidden; box-shadow:var(--shadow-md); }
         .erp-table thead th { background:var(--clr-ink); color:var(--clr-royal); font-family:'Bevan',serif; font-weight:400;
@@ -99,7 +96,7 @@
         .erp-table tbody tr:hover td { background:rgba(255,179,71,.22); }
         .erp-table tfoot td { background:var(--clr-cream); color:var(--clr-gold); font-weight:800; border-top:3px solid var(--clr-ink); }
 
-        /* ══════════ BOTONES (etiqueta de precio) ══════════ */
+        /* ══════════ BOTONES ══════════ */
         .btn-erp-primary,.btn-erp-gold,.btn-erp-danger { border:2.5px solid var(--clr-ink); border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink);
             padding:.42rem 1.3rem; font-weight:700; font-size:.9rem; cursor:pointer; text-decoration:none; display:inline-block;
             transition:transform .12s,box-shadow .12s,background .15s; }
@@ -126,7 +123,7 @@
             box-shadow:var(--shadow-sm); padding:.9rem 1.25rem; color:var(--clr-ink); }
         .erp-alert-danger{background:#FF9A7A} .erp-alert-info{background:#FFC56E} .erp-alert-success{background:#9BCB6B}
 
-        /* ══════════ TÍTULO DE PÁGINA (con disco giratorio) ══════════ */
+        /* ══════════ TÍTULO DE PÁGINA ══════════ */
         .erp-page-title { display:flex; align-items:center; gap:1rem; margin-bottom:1.75rem; padding-bottom:.75rem; border-bottom:3px dashed var(--clr-border); }
         .erp-page-title::before { content:""; flex-shrink:0; width:46px; height:46px; border-radius:50%; border:2px solid #000;
             background:radial-gradient(circle,var(--clr-royal) 0 22%,#000 23% 26%,transparent 27%),repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px);
@@ -136,79 +133,37 @@
 
         code,.mono { font-family:'Special Elite',monospace; font-size:.88em; color:var(--clr-code); background:rgba(14,8,5,.3); padding:.1em .4em; border-radius:4px; }
 
-        /* ══════════ PISO DE MADERA + FOOTER ══════════ */
+        /* ══════════ FOOTER ══════════ */
         .erp-footer { position:relative; z-index:3; color:rgba(241,228,200,.8); text-align:center; font-family:'Special Elite',monospace;
             font-size:.85rem; padding:.9rem; border-top:4px solid var(--clr-royal);
             background:repeating-linear-gradient(90deg,rgba(0,0,0,.25) 0 2px,transparent 2px 70px),var(--clr-navy); }
 
-        /* ══════════ TOCADISCOS (overlay global) ══════════ */
-        .tt { position:fixed; inset:0; z-index:2000; background:rgba(10,6,3,.82); display:flex; align-items:center; justify-content:center;
-            padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
+        /* ══════════ TOCADISCOS · ESTRUCTURA GENERAL (el dibujo está en partials/tocadiscos.html) ══════════ */
+        .tt { position:fixed; inset:0; z-index:2000; background:rgba(10,6,3,.85); display:flex; align-items:center; justify-content:center;
+            padding:14px; opacity:0; pointer-events:none; transition:opacity .3s; }
         .tt.open { opacity:1; pointer-events:auto; }
-        .tt-box { width:min(480px,100%); max-height:96vh; overflow-y:auto; background:var(--clr-navy); color:#F1E4C8;
+        .tt-box { width:min(460px,100%); max-height:94vh; overflow-y:auto; background:var(--clr-navy); color:#F1E4C8;
             border:3px solid var(--clr-ink); border-radius:14px; box-shadow:0 12px 0 var(--clr-ink); padding:18px;
             text-align:center; font-family:'Special Elite',monospace; }
         .tt-box h2 { font-family:'Bevan',serif; font-weight:400; color:#FFB347; margin:0 0 12px; font-size:1.3rem; }
-
-        /* Tornamesa */
-        .tt-tornamesa { position:relative; width:100%; max-width:400px; height:330px; margin:0 auto; }
-        .tt-cubierta { position:absolute; left:14px; right:14px; top:0; height:64px; border-radius:10px 10px 4px 4px;
-            background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(200,230,255,.08) 70%,rgba(255,255,255,.18));
-            border:2px solid rgba(255,255,255,.45); transform:perspective(400px) rotateX(-18deg); transform-origin:bottom;
-            box-shadow:0 2px 6px rgba(0,0,0,.4); }
-        .tt-cubierta::after { content:""; position:absolute; left:10%; right:10%; bottom:-6px; height:8px; background:#bbb; border-radius:4px; }
-
-        .tt-base { position:absolute; left:0; right:0; top:60px; bottom:0; border-radius:14px; border:3px solid #1a0c05;
-            background:repeating-linear-gradient(90deg,rgba(0,0,0,.09) 0 2px,transparent 2px 10px),
-                       linear-gradient(165deg,#A8703D,#6B3C1C 55%,#4A2510);
-            box-shadow:inset 0 2px 0 rgba(255,255,255,.22), 0 8px 0 var(--clr-ink); }
-        .tt-base::before, .tt-base::after { content:""; position:absolute; bottom:-14px; width:22px; height:12px; background:#111; border-radius:0 0 6px 6px; }
-        .tt-base::before { left:22px; }
-        .tt-base::after { right:22px; }
-
-        .tt-plato { position:absolute; left:36%; top:50%; width:236px; height:236px; transform:translate(-50%,-50%); border-radius:50%;
-            background:radial-gradient(circle,#2b2b2b 0 62%,#141414 63%);
-            border:6px solid #9d9d9d; box-shadow:0 4px 10px rgba(0,0,0,.6), inset 0 0 0 2px #333; }
-        .tt-plato::after { content:""; position:absolute; left:50%; top:50%; width:12px; height:12px; border-radius:50%;
-            transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 35%,#fff,#888); z-index:3; }
-
-        .tt-disco { position:absolute; inset:2px; border-radius:50%; z-index:2; transform:translateY(-150px); opacity:0;
-            transition:transform .9s cubic-bezier(.3,1.3,.5,1), opacity .4s; }
-        .tt.open .tt-disco { transform:none; opacity:1; }
-        .tt-surco { width:100%; height:100%; border-radius:50%; position:relative; animation:gira 2.4s linear infinite;
-            animation-play-state:paused;
-            background:
-                radial-gradient(circle,var(--a) 0 22%,#000 23% 25%,transparent 26%),
-                conic-gradient(from 20deg,rgba(255,255,255,.12),transparent 14%,transparent 50%,rgba(255,255,255,.1) 60%,transparent 72%),
-                repeating-radial-gradient(circle,#151515 0 2px,#252525 3px 4px); }
-        .tt.playing .tt-surco { animation-play-state:running; }
         .tt-etiq { position:absolute; left:50%; top:50%; width:38%; height:38%; transform:translate(-50%,-50%); border-radius:50%;
             border:3px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
-
-        .tt-pivote { position:absolute; right:87px; top:50px; width:26px; height:26px; border-radius:50%; z-index:4;
-            background:radial-gradient(circle at 35% 35%,#fff,#9a9a9a 55%,#333); box-shadow:0 2px 4px rgba(0,0,0,.5); }
-        .tt-brazo { position:absolute; right:100px; top:59px; width:120px; height:8px; border-radius:4px; z-index:4;
-            background:linear-gradient(#f2f2f2,#8a8a8a); box-shadow:0 2px 3px rgba(0,0,0,.4);
-            transform-origin:100% 50%; transform:rotate(12deg); transition:transform .9s ease; }
-        .tt-brazo::after { content:""; position:absolute; left:-12px; top:-5px; width:22px; height:16px; background:#222;
-            border:1px solid #000; border-radius:3px; }
-        .tt.playing .tt-brazo { transform:rotate(-44deg); }
-
-        .tt-led { position:absolute; left:20px; bottom:18px; width:9px; height:9px; border-radius:50%; background:#ff4a2a; box-shadow:0 0 8px #ff4a2a; }
-        .tt-marca { position:absolute; right:18px; bottom:14px; font-family:'Bevan',serif; font-size:.8rem; color:#E8C9A0; letter-spacing:.06em; }
-
         #ttSpot iframe { display:block; width:100%; height:152px; border:0; border-radius:12px; margin-top:14px; }
         .tt .btn { font-family:inherit; font-weight:700; background:#FFB347; color:var(--clr-ink); border:3px solid var(--clr-ink);
             border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink); padding:.45rem .9rem; margin:.4rem .2rem 0; cursor:pointer; }
         .tt .btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--clr-ink); }
-        .tt-picker { display:none; gap:10px; overflow-x:auto; padding:12px 4px; margin-top:10px; }
+        .tt-picker { display:none; gap:12px; overflow-x:auto; padding:12px 6px; margin-top:10px; }
         .tt-picker.show { display:flex; }
-        .pick { flex:0 0 84px; cursor:pointer; font-size:.7rem; text-align:center; color:#F1E4C8; }
-        .pick .c { width:84px; height:84px; border:3px solid #000; background-size:cover; background-position:center; margin-bottom:4px; }
-        .pick.act .c { outline:3px solid #FFB347; }
+        .pick { flex:0 0 92px; cursor:pointer; font-size:.7rem; text-align:center; color:#F1E4C8; }
+        .disco-mini { position:relative; width:84px; height:84px; margin:0 auto 6px; border-radius:50%; border:2px solid #000;
+            background:repeating-radial-gradient(circle,#161616 0 2px,#262626 3px 4px); transition:transform .4s; }
+        .pick:hover .disco-mini { transform:rotate(45deg); }
+        .pick.act .disco-mini { outline:3px solid #FFB347; outline-offset:2px; }
+        .disco-mini .etiq { position:absolute; left:50%; top:50%; width:40%; height:40%; transform:translate(-50%,-50%); border-radius:50%;
+            border:2px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
         .volador { position:fixed; width:40px; height:40px; border-radius:50%; border:2px solid #000; pointer-events:none; z-index:2100; }
 
-        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco,.tt-surco { animation:none; } * { transition:none !important; } }
+        @media (prefers-reduced-motion: reduce) { .mini-disco,.erp-page-title::before,.foco { animation:none; } * { transition:none !important; } }
         @media (max-width:576px) { .erp-page-title h2 { font-size:1.7rem; } }
     </style>
     {% block extra_css %}{% endblock %}
@@ -220,7 +175,6 @@
     <a class="erp-brand" href="/"><span class="mini-disco" aria-hidden="true"></span>
         <span>Gio's Wax Cellar <small>· el sótano del vinilo</small></span></a>
     <div class="erp-nav-links">
-        {# Reportes: prueba varios nombres de ruta sin romper la página #}
         {% url 'reportes:inicio' as rep_inicio %}
         {% url 'reportes:lista' as rep_lista %}
         {% url 'reportes:dashboard' as rep_dash %}
@@ -266,34 +220,7 @@
 </footer>
 
 <!-- Tocadiscos (disponible en todas las páginas) -->
-<div class="tt" id="tt" role="dialog" aria-modal="true" aria-labelledby="ttTitulo">
-    <div class="tt-box">
-        <h2 id="ttTitulo"></h2>
-
-        <div class="tt-tornamesa">
-            <div class="tt-cubierta"></div>
-            <div class="tt-base">
-                <div class="tt-plato">
-                    <div class="tt-disco">
-                        <div class="tt-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
-                    </div>
-                </div>
-                <span class="tt-led"></span>
-                <span class="tt-marca">GIO'S · 33⅓</span>
-            </div>
-            <div class="tt-pivote"></div>
-            <div class="tt-brazo"></div>
-        </div>
-
-        <div id="ttSpot"></div>
-        <div>
-            <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
-            <button type="button" class="btn" id="ttElegir">💿 Elegir vinilo</button>
-            <button type="button" class="btn" id="ttNormal">Vista normal</button>
-        </div>
-        <div class="tt-picker" id="ttPicker"></div>
-    </div>
-</div>
+{% include "partials/tocadiscos.html" %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

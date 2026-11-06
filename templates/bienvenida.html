@@ -11,7 +11,7 @@
     .letrero .apodo { font-family:'Special Elite',monospace; font-size:1.15rem; color:var(--clr-text); margin:.5rem 0 0; }
     .letrero .sub { color:var(--clr-muted); font-weight:600; margin:.3rem 0 0; }
 
-    /* ── Caja de discos (vista normal) ── */
+    /* ── Caja de discos ── */
     .caja { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:2.2rem 1.5rem; margin-top:1.5rem; }
     .vinilo { position:relative; }
     .vinilo-stage { position:relative; width:70%; aspect-ratio:1; margin:0 auto 0 0; }
@@ -50,59 +50,78 @@
     .etiqueta a { display:inline-block; background:var(--clr-royal); color:var(--clr-ink); border:2px solid var(--clr-ink); border-radius:3px;
         font-family:'Work Sans',sans-serif; font-weight:700; font-size:.82rem; padding:.15rem .8rem; text-decoration:none; }
 
-    /* ── Tocadiscos (overlay al centro) ── */
-    .tt { position:fixed; inset:0; z-index:900; background:rgba(10,6,3,.82); display:flex; align-items:center; justify-content:center;
-        padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
-    .tt.open { opacity:1; pointer-events:auto; }
-    .tt-box { width:min(480px,100%); max-height:96vh; overflow-y:auto; background:var(--clr-navy); color:#F1E4C8;
-        border:3px solid var(--clr-ink); border-radius:14px; box-shadow:0 12px 0 var(--clr-ink); padding:18px;
-        text-align:center; font-family:'Special Elite',monospace; }
-    .tt-box h2 { font-family:'Bevan',serif; font-weight:400; color:#FFB347; margin:0 0 12px; font-size:1.3rem; }
+    /* ══════════ FONDO · CAFETERÍA DE VINILOS ══════════ */
+    .cafe-fondo { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none;
+        background:radial-gradient(ellipse at 50% 15%, #6a3c1c 0%, #2b170c 65%, #160b05 100%); }
+    .cafe-fondo::after { content:""; position:absolute; inset:0;
+        background:radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(10,5,2,.75) 100%); }
+    .cafe-luz { position:absolute; top:-120px; left:50%; width:900px; height:500px; transform:translateX(-50%);
+        background:radial-gradient(ellipse at 50% 0%, rgba(255,200,120,.35), transparent 70%); }
 
-    .tt-deck { position:relative; width:260px; height:260px; margin:0 auto; border-radius:14px; background:#0c0704;
-        border:3px solid #000; overflow:hidden; }
-    .tt-plato { position:absolute; inset:8px; border-radius:50%; background:#111; display:grid; place-items:center; }
-    .tt-disco { width:244px; height:244px; border-radius:50%; transform:translateY(-270px);
-        transition:transform .9s cubic-bezier(.3,1.3,.5,1); }
-    .tt.open .tt-disco { transform:translateY(0); }
-    .tt-surco { width:100%; height:100%; border-radius:50%; position:relative; animation:gira 2.4s linear infinite;
-        animation-play-state:paused;
-        background:
-            radial-gradient(circle,var(--a) 0 22%,#000 23% 25%,transparent 26%),
-            repeating-radial-gradient(circle,#151515 0 2px,#252525 3px 4px); }
-    .tt.playing .tt-surco { animation-play-state:running; }
-    .tt-etiq { position:absolute; left:50%; top:50%; width:38%; height:38%; transform:translate(-50%,-50%); border-radius:50%;
-        border:3px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
-    .tt-brazo { position:absolute; top:-14px; right:-18px; width:9px; height:150px; border-radius:6px;
-        background:linear-gradient(90deg,#999,#ddd); transform-origin:4px 4px; transform:rotate(-30deg);
-        transition:transform .8s ease; }
-    .tt.playing .tt-brazo { transform:rotate(-6deg); }
+    .estante { position:absolute; left:-2%; right:-2%; height:120px; opacity:.9;
+        background:repeating-linear-gradient(90deg,
+            #B8431A 0 46px, #15202c 46px 48px,
+            #E5A32B 48px 92px, #15202c 92px 94px,
+            #2F5D7A 94px 136px, #15202c 136px 138px,
+            #7B3FA0 138px 176px, #15202c 176px 178px,
+            #F1E4C8 178px 224px, #15202c 224px 226px,
+            #6B8E4E 226px 262px, #15202c 262px 264px,
+            #D98AA8 264px 300px, #15202c 300px 302px,
+            #3A3A4A 302px 340px, #15202c 340px 342px); }
+    .estante::after { content:""; position:absolute; left:0; right:0; bottom:-16px; height:16px;
+        background:linear-gradient(#8a5530,#3e2010); box-shadow:0 8px 12px rgba(0,0,0,.55); }
+    .estante.e1 { top:7%; }
+    .estante.e2 { top:31%; }
 
-    #ttSpot iframe { display:block; width:100%; height:152px; border:0; border-radius:12px; margin-top:14px; }
+    .vdisco { position:absolute; width:170px; height:170px; border-radius:50%; border:3px solid #000;
+        background:radial-gradient(circle,var(--c1) 0 20%,#000 21% 23%,transparent 24%),
+                   conic-gradient(from 30deg,rgba(255,255,255,.1),transparent 15%,transparent 50%,rgba(255,255,255,.08) 60%,transparent 75%),
+                   repeating-radial-gradient(circle,#141414 0 2px,#262626 3px 4px);
+        box-shadow:4px 6px 12px rgba(0,0,0,.6); }
+    .vdisco.d1 { --c1:#B8431A; left:-50px; top:52%; transform:rotate(-12deg); }
+    .vdisco.d2 { --c1:#7B3FA0; right:-60px; top:24%; transform:rotate(18deg); width:200px; height:200px; }
+    .vdisco.d3 { --c1:#2F5D7A; right:4%; top:56%; transform:rotate(-6deg); width:130px; height:130px; }
 
-    .btn { font-family:inherit; font-weight:700; background:#FFB347; color:var(--clr-ink); border:3px solid var(--clr-ink);
-        border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink); padding:.45rem .9rem; margin:.4rem .2rem 0; cursor:pointer; }
-    .btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--clr-ink); }
+    .cafe-barra { position:absolute; left:0; right:0; bottom:0; height:21%;
+        background:repeating-linear-gradient(90deg,rgba(0,0,0,.14) 0 2px,transparent 2px 60px),
+                   linear-gradient(#9a5e30,#5a3218 45%,#2a1608);
+        border-top:8px solid #C07A3E; box-shadow:inset 0 10px 18px rgba(0,0,0,.45), 0 -6px 18px rgba(0,0,0,.5); }
 
-    .tt-picker { display:none; gap:10px; overflow-x:auto; padding:12px 4px; margin-top:10px; }
-    .tt-picker.show { display:flex; }
-    .pick { flex:0 0 84px; cursor:pointer; font-size:.7rem; text-align:center; color:#F1E4C8; }
-    .pick .c { width:84px; height:84px; border:3px solid #000; background-size:cover; background-position:center; margin-bottom:4px; }
-    .pick.act .c { outline:3px solid #FFB347; }
+    .taza { position:absolute; bottom:calc(21% - 2px); width:52px; height:34px; background:#F1E4C8;
+        border:3px solid #2a1206; border-radius:0 0 26px 26px; box-shadow:0 4px 6px rgba(0,0,0,.5); }
+    .taza::before { content:""; position:absolute; top:4px; left:4px; right:4px; height:6px; border-radius:50%; background:#5a2e14; }
+    .taza::after { content:""; position:absolute; right:-14px; top:6px; width:12px; height:14px;
+        border:3px solid #2a1206; border-left:none; border-radius:0 10px 10px 0; }
+    .taza.t1 { left:12%; }
+    .taza.t2 { left:19%; transform:scale(.85); }
+    .taza.t3 { right:14%; }
 
-    /* ── Vinilos volando ── */
-    .volador { position:fixed; width:40px; height:40px; border-radius:50%; border:2px solid #000; pointer-events:none; z-index:1000; }
-
-    @keyframes gira { to { transform:rotate(360deg); } }
-
-    @media (prefers-reduced-motion: reduce) {
-        .tt-surco { animation:none; }
-        .funda:hover { transform:none; }
+    @media (max-width:768px) {
+        .vdisco.d2 { width:120px; height:120px; right:-40px; }
+        .vdisco.d3 { display:none; }
+        .estante { height:80px; }
+        .estante::after { bottom:-12px; height:12px; }
     }
+    [data-theme="light"] .cafe-fondo { opacity:.55; }
+
+    @media (prefers-reduced-motion: reduce) { .funda:hover { transform:none; } }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="cafe-fondo" aria-hidden="true">
+    <div class="cafe-luz"></div>
+    <div class="estante e1"></div>
+    <div class="estante e2"></div>
+    <div class="vdisco d1"></div>
+    <div class="vdisco d2"></div>
+    <div class="vdisco d3"></div>
+    <div class="cafe-barra"></div>
+    <span class="taza t1"></span>
+    <span class="taza t2"></span>
+    <span class="taza t3"></span>
+</div>
+
 <div class="letrero">
     <h1>Gio's Wax Cellar</h1>
     <p class="apodo">«El sótano del vinilo» · discos, café y buena vibra</p>
@@ -220,31 +239,12 @@
     </div>
     {% endfor %}
 </div>
-
-<!-- Tocadiscos -->
-<div class="tt" id="tt" role="dialog" aria-modal="true" aria-labelledby="ttTitulo">
-    <div class="tt-box">
-        <h2 id="ttTitulo"></h2>
-        <div class="tt-deck">
-            <div class="tt-plato">
-                <div class="tt-disco">
-                    <div class="tt-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
-                </div>
-            </div>
-            <div class="tt-brazo"></div>
-        </div>
-        <div id="ttSpot"></div>
-        <div>
-            <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
-            <button type="button" class="btn" id="ttElegir">💿 Elegir vinilo</button>
-            <button type="button" class="btn" id="ttNormal">Vista normal</button>
-        </div>
-        <div class="tt-picker" id="ttPicker"></div>
-    </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
+<script>
+window.VINILOS_DATA = null;
+</script>
 <script>
 (function () {
     /* ═══════════ TUS VINILOS ═══════════
@@ -268,10 +268,9 @@
     var ttSpot = document.getElementById('ttSpot');
     var ttPicker = document.getElementById('ttPicker');
     var ttGirar = document.getElementById('ttGirar');
-    var vinilos = document.querySelectorAll('.vinilo');
 
     /* ── Portadas de la caja ── */
-    vinilos.forEach(function (el, i) {
+    document.querySelectorAll('.vinilo').forEach(function (el, i) {
         var v = VINILOS[i % VINILOS.length];
         var funda = el.querySelector('.funda');
         el.style.setProperty('--a', v.a); el.style.setProperty('--b', v.b); el.style.setProperty('--c', v.c);
@@ -281,14 +280,14 @@
         funda.addEventListener('click', function () { abrir(i); });
     });
 
-    /* ── Selector de vinilos (barra) ── */
+    /* ── Selector de vinilos ── */
     VINILOS.forEach(function (v, i) {
         var p = document.createElement('div');
         p.className = 'pick';
-        p.innerHTML = '<div class="c"></div>' + v.artista;
-        var c = p.querySelector('.c');
-        c.style.background = 'linear-gradient(160deg,' + v.a + ',' + v.c + ')';
-        if (v.img) c.style.backgroundImage = 'url(' + v.img + ')';
+        p.innerHTML = '<div class="disco-mini"><span class="etiq"></span></div>' + v.artista;
+        p.style.setProperty('--a', v.a);
+        p.style.setProperty('--c', v.c);
+        if (v.img) p.querySelector('.etiq').style.backgroundImage = 'url(' + v.img + ')';
         p.addEventListener('click', function () { abrir(i); });
         ttPicker.appendChild(p);
     });
@@ -299,10 +298,15 @@
         });
     }
 
+    function actualizarBoton() {
+        ttGirar.textContent = ov.classList.contains('playing') ? '⏸ Pausa' : '⏵ Girar';
+    }
+
     /* ── Abrir / cerrar tocadiscos ── */
     function abrir(i) {
         var v = VINILOS[i];
-        ov.style.setProperty('--a', v.a); ov.style.setProperty('--b', v.b); ov.style.setProperty('--c', v.c);
+        ov.style.setProperty('--a', v.a);
+        ov.style.setProperty('--c', v.c);
         ttTitulo.textContent = v.artista + ' · ' + v.disco;
         ttEtiq.style.backgroundImage = v.img ? 'url(' + v.img + ')' : '';
 
@@ -319,18 +323,15 @@
         marcarPicker(i);
         ov.classList.remove('playing');
         ov.classList.add('open');
-        setTimeout(function () { ov.classList.add('playing'); }, 900);
+        setTimeout(function () { ov.classList.add('playing'); actualizarBoton(); }, 900);
         actualizarBoton();
     }
 
     function cerrar() {
         ov.classList.remove('open', 'playing');
-        ttSpot.innerHTML = ''; // detiene la música al cerrar
+        ttSpot.innerHTML = '';
         ttPicker.classList.remove('show');
-    }
-
-    function actualizarBoton() {
-        ttGirar.textContent = ov.classList.contains('playing') ? '⏸ Pausa' : '⏵ Girar';
+        actualizarBoton();
     }
 
     ttGirar.addEventListener('click', function () {
