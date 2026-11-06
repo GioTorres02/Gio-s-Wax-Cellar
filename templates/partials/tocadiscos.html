@@ -29,6 +29,16 @@
     .tt2-pivote { position:absolute; right:calc(15% - 13px); top:calc(24% - 9.5px); width:26px; height:26px; border-radius:50%; z-index:5;
         background:radial-gradient(circle at 35% 35%,#fff,#9a9a9a 55%,#333); box-shadow:0 2px 4px rgba(0,0,0,.5); }
 
+    /* ══════════ PANTALLA COMPLETA AL ABRIR UN VINILO ══════════ */
+    .tt.open { padding:0; background:rgba(8,4,2,.96); }
+    .tt.open .tt-box { width:100vw; height:100vh; max-width:none; max-height:none; border:0; border-radius:0;
+        box-shadow:none; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .tt.open .tt-box h2 { font-size:clamp(1.3rem,3vw,2.2rem); margin-bottom:16px; }
+    .tt.open .tt2-deck { width:min(92vw, max(280px, calc((100vh - 460px) * 1.4545))); }
+    .tt.open #ttSpot { width:min(92vw,720px); }
+    .tt.open #ttSpot iframe { height:152px; }
+    .tt.open .tt-picker { width:min(92vw,900px); }
+
     @media (prefers-reduced-motion: reduce) { .tt2-surco { animation:none; } }
 </style>
 
