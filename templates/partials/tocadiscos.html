@@ -39,7 +39,7 @@
     .tt-etiq { box-shadow:inset 0 0 0 2px rgba(255,255,255,.15), 0 0 0 2px rgba(0,0,0,.6); }
 
     /* Ecualizador */
-    .tt-eq { display:flex; align-items:flex-end; justify-content:center; gap:6px; height:40px; margin:14px auto 0; flex:0 0 auto; }
+    .tt-eq { display:flex; align-items:flex-end; justify-content:center; gap:6px; height:40px; margin-top:14px; flex:0 0 auto; }
     .tt-eq span { width:10px; height:40px; border-radius:4px 4px 0 0; transform-origin:bottom;
         background:linear-gradient(var(--a,#FFB347),var(--c,#B8431A)); box-shadow:0 0 10px var(--a,#FFB347);
         transform:scaleY(.15); animation:eq 1s ease-in-out infinite alternate; animation-play-state:paused; }
@@ -56,40 +56,46 @@
     .tt.playing .tt-eq span { animation-play-state:running; }
     @keyframes eq { from { transform:scaleY(.15); } to { transform:scaleY(1); } }
 
-    /* Controles */
     .tt-controles { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; }
 
-    /* ══════════ PANTALLA COMPLETA · DISTRIBUCIÓN ══════════ */
+    /* ══════════ PANTALLA COMPLETA · DOS COLUMNAS ══════════ */
     .tt.open { padding:0; background:radial-gradient(ellipse at 50% 40%, rgba(40,22,12,.97), rgba(6,3,1,.98) 75%);
         backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
 
     .tt.open .tt-box { width:100vw; height:100vh; height:100dvh; max-width:none; max-height:none;
-        background:transparent; border:0; border-radius:0; box-shadow:none; padding:clamp(10px,2.2vh,24px) 16px;
-        overflow-y:auto; display:flex; flex-direction:column; align-items:center;
-        justify-content:center; justify-content:safe center; gap:clamp(6px,1.6vh,14px);
+        background:transparent; border:0; border-radius:0; box-shadow:none;
+        padding:clamp(12px,2.5vh,28px) clamp(16px,3vw,48px); overflow-y:auto;
+        display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-rows:auto 1fr;
+        column-gap:clamp(24px,5vw,80px); row-gap:clamp(8px,1.5vh,16px);
+        align-items:center; justify-items:center;
         animation:entra .5s cubic-bezier(.2,.9,.3,1.2); }
     @keyframes entra {
         from { opacity:0; transform:scale(.96) translateY(10px); }
         to   { opacity:1; transform:none; }
     }
 
-    .tt.open .tt-box h2 { margin:0; font-family:'Bevan',serif; font-weight:400; letter-spacing:.02em;
-        font-size:clamp(1.3rem,3vh,2.4rem); color:#FFB347;
+    .tt.open .tt-box h2 { grid-column:1 / -1; margin:0; text-align:center; font-family:'Bevan',serif; font-weight:400;
+        letter-spacing:.02em; font-size:clamp(1.3rem,3vh,2.4rem); color:#FFB347;
         text-shadow:0 0 18px color-mix(in srgb, var(--a,#FFB347) 70%, transparent), 3px 3px 0 #000; }
 
-    /* Tornamesa: se adapta a la altura disponible, sin pasarse de la pantalla */
-    .tt.open .tt2-deck { width:clamp(240px, min(90vw, (100dvh - 300px) * 1.4545), 960px); }
+    /* Columna izquierda: tornamesa + ecualizador */
+    .tt-izq { display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; }
+    .tt.open .tt2-deck { width:clamp(260px, min(40vw, (100dvh - 230px) * 1.4545), 680px); }
+    .tt.open .tt-eq { height:34px; margin-top:16px; }
 
-    .tt.open .tt-eq { height:34px; margin:0; }
-
-    .tt.open #ttSpot { width:min(92vw,760px); }
+    /* Columna derecha: Spotify, botones y vinilos */
+    .tt-der { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(8px,1.6vh,16px);
+        width:100%; max-width:560px; }
+    .tt.open #ttSpot { width:100%; }
     .tt.open #ttSpot iframe { height:152px; margin-top:0; }
-
-    .tt.open .tt-controles { gap:8px; }
+    .tt.open .tt-controles { gap:10px; }
     .tt.open .btn { font-size:1.05rem; padding:.55rem 1.1rem; margin:0; }
 
-    .tt.open .tt-picker { display:flex; gap:12px; width:min(92vw,900px); margin:0; padding:6px 4px; overflow-x:auto; }
-    .tt.open .pick { flex:0 0 84px; }
+    /* En escritorio el selector siempre está visible en cuadrícula, así que el botón "Elegir" no hace falta */
+    .tt.open .tt-picker { display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:10px;
+        width:100%; padding:6px 4px; margin:0; }
+    .tt.open #ttElegir { display:none; }
+    .tt.open .pick { flex:none; width:auto; }
 
     .tt.open.playing .tt-box { animation:entra .5s cubic-bezier(.2,.9,.3,1.2), pulso 2.4s ease-in-out .5s infinite; }
     @keyframes pulso {
@@ -97,22 +103,25 @@
         50%      { filter:drop-shadow(0 0 80px var(--a,#FFB347)); }
     }
 
-    /* Pantallas bajas (laptops): compacta el reproductor y los discos */
-    @media (max-height:760px) {
-        .tt.open #ttSpot iframe { height:80px; }
-        .tt.open .tt-eq { height:26px; }
-        .tt.open .pick { flex:0 0 70px; font-size:.62rem; }
-        .tt.open .disco-mini { width:60px; height:60px; }
-    }
-
-    /* Celular */
-    @media (max-width:600px) {
+    /* ══════════ CELULAR · UNA COLUMNA ══════════ */
+    @media (max-width:899px) {
+        .tt.open .tt-box { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+        .tt.open .tt2-deck { width:clamp(240px, min(88vw, (100dvh - 300px) * 1.4545), 560px); }
+        .tt-der { max-width:100%; }
+        .tt.open #ttElegir { display:inline-block; }
+        .tt.open .tt-picker { display:none; }
+        .tt.open .tt-picker.show { display:flex; overflow-x:auto; grid-template-columns:none; }
+        .tt.open .pick { flex:0 0 84px; }
         .tt.open .btn { font-size:.95rem; padding:.5rem .8rem; }
-        .tt-eq { gap:3px; }
-        .tt-eq span { width:6px; }
     }
 
-    /* ══════════ SELECTOR Y BOTONES ══════════ */
+    /* Pantallas bajas */
+    @media (max-height:700px) and (min-width:900px) {
+        .tt.open #ttSpot iframe { height:80px; }
+        .tt.open .disco-mini { width:70px; height:70px; }
+    }
+
+    /* ══════════ BOTONES Y SELECTOR ══════════ */
     .tt .btn { font-family:inherit; font-weight:700; color:var(--clr-ink); border:3px solid var(--clr-ink); border-radius:6px;
         background:linear-gradient(#FFD27A,#FFB347 55%,#E8962E);
         box-shadow:0 4px 0 #0E0805, 0 8px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.5);
@@ -143,66 +152,70 @@
     <div class="tt-box">
         <h2 id="ttTitulo"></h2>
 
-        <div class="tt2-deck">
-            <svg class="tt2-svg" viewBox="0 0 480 330" aria-hidden="true">
-                <defs>
-                    <linearGradient id="tt2Madera" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0" stop-color="#A8703D"/>
-                        <stop offset=".55" stop-color="#6B3C1C"/>
-                        <stop offset="1" stop-color="#4A2510"/>
-                    </linearGradient>
-                    <linearGradient id="tt2Acrilico" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stop-color="#ffffff" stop-opacity=".45"/>
-                        <stop offset=".5" stop-color="#cfe8ff" stop-opacity=".12"/>
-                        <stop offset="1" stop-color="#ffffff" stop-opacity=".25"/>
-                    </linearGradient>
-                </defs>
+        <div class="tt-izq">
+            <div class="tt2-deck">
+                <svg class="tt2-svg" viewBox="0 0 480 330" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="tt2Madera" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#A8703D"/>
+                            <stop offset=".55" stop-color="#6B3C1C"/>
+                            <stop offset="1" stop-color="#4A2510"/>
+                        </linearGradient>
+                        <linearGradient id="tt2Acrilico" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#ffffff" stop-opacity=".45"/>
+                            <stop offset=".5" stop-color="#cfe8ff" stop-opacity=".12"/>
+                            <stop offset="1" stop-color="#ffffff" stop-opacity=".25"/>
+                        </linearGradient>
+                    </defs>
 
-                <rect x="30" y="4" width="420" height="110" rx="12" fill="url(#tt2Acrilico)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
-                <rect x="210" y="96" width="60" height="10" rx="4" fill="#9a9a9a"/>
+                    <rect x="30" y="4" width="420" height="110" rx="12" fill="url(#tt2Acrilico)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+                    <rect x="210" y="96" width="60" height="10" rx="4" fill="#9a9a9a"/>
 
-                <rect x="10" y="70" width="460" height="250" rx="16" fill="url(#tt2Madera)" stroke="#2a1206" stroke-width="3"/>
-                <path d="M30 110 Q240 96 450 112 M30 150 Q240 136 450 152 M30 280 Q240 266 450 282"
-                      fill="none" stroke="rgba(0,0,0,.14)" stroke-width="2"/>
+                    <rect x="10" y="70" width="460" height="250" rx="16" fill="url(#tt2Madera)" stroke="#2a1206" stroke-width="3"/>
+                    <path d="M30 110 Q240 96 450 112 M30 150 Q240 136 450 152 M30 280 Q240 266 450 282"
+                          fill="none" stroke="rgba(0,0,0,.14)" stroke-width="2"/>
 
-                <circle cx="40" cy="322" r="8" fill="#111"/>
-                <circle cx="440" cy="322" r="8" fill="#111"/>
+                    <circle cx="40" cy="322" r="8" fill="#111"/>
+                    <circle cx="440" cy="322" r="8" fill="#111"/>
 
-                <circle cx="150" cy="160" r="120" fill="#0c0704"/>
+                    <circle cx="150" cy="160" r="120" fill="#0c0704"/>
 
-                <circle cx="34" cy="296" r="4.5" fill="#ff4a2a"/>
-                <text x="446" y="300" text-anchor="end" font-family="Bevan, serif" font-size="13" fill="#E8C9A0" letter-spacing="1">GIO'S · 33⅓</text>
-            </svg>
+                    <circle cx="34" cy="296" r="4.5" fill="#ff4a2a"/>
+                    <text x="446" y="300" text-anchor="end" font-family="Bevan, serif" font-size="13" fill="#E8C9A0" letter-spacing="1">GIO'S · 33⅓</text>
+                </svg>
 
-            <div class="tt2-platter">
-                <div class="tt2-disco">
-                    <div class="tt2-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
+                <div class="tt2-platter">
+                    <div class="tt2-disco">
+                        <div class="tt2-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
+                    </div>
                 </div>
+
+                <span class="tt2-pivote"></span>
+                <div class="tt2-arm"></div>
             </div>
 
-            <span class="tt2-pivote"></span>
-            <div class="tt2-arm"></div>
+            <div class="tt-eq" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
         </div>
 
-        <div class="tt-eq" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span>
-            <span></span><span></span><span></span><span></span><span></span>
-        </div>
+        <div class="tt-der">
+            <div id="ttSpot"></div>
 
-        <div id="ttSpot"></div>
+            <div class="tt-controles">
+                <button type="button" class="btn" id="ttPrev" aria-label="Vinilo anterior">◀</button>
+                <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
+                <button type="button" class="btn" id="ttNext" aria-label="Vinilo siguiente">▶</button>
+            </div>
+            <div class="tt-controles">
+                <button type="button" class="btn" id="ttElegir">💿 Elegir vinilo</button>
+                <button type="button" class="btn" id="ttVel">33⅓ RPM</button>
+                <button type="button" class="btn" id="ttNormal">Vista normal</button>
+            </div>
 
-        <div class="tt-controles">
-            <button type="button" class="btn" id="ttPrev" aria-label="Vinilo anterior">◀</button>
-            <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
-            <button type="button" class="btn" id="ttNext" aria-label="Vinilo siguiente">▶</button>
+            <div class="tt-picker" id="ttPicker"></div>
         </div>
-        <div class="tt-controles">
-            <button type="button" class="btn" id="ttElegir">💿 Elegir vinilo</button>
-            <button type="button" class="btn" id="ttVel">33⅓ RPM</button>
-            <button type="button" class="btn" id="ttNormal">Vista normal</button>
-        </div>
-
-        <div class="tt-picker" id="ttPicker"></div>
     </div>
 </div>
 
