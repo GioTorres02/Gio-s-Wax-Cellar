@@ -141,7 +141,7 @@
             font-size:.85rem; padding:.9rem; border-top:4px solid var(--clr-royal);
             background:repeating-linear-gradient(90deg,rgba(0,0,0,.25) 0 2px,transparent 2px 70px),var(--clr-navy); }
 
-        /* ══════════ NUEVO · TOCADISCOS (overlay global) ══════════ */
+        /* ══════════ TOCADISCOS (overlay global) ══════════ */
         .tt { position:fixed; inset:0; z-index:2000; background:rgba(10,6,3,.82); display:flex; align-items:center; justify-content:center;
             padding:16px; opacity:0; pointer-events:none; transition:opacity .3s; }
         .tt.open { opacity:1; pointer-events:auto; }
@@ -149,24 +149,54 @@
             border:3px solid var(--clr-ink); border-radius:14px; box-shadow:0 12px 0 var(--clr-ink); padding:18px;
             text-align:center; font-family:'Special Elite',monospace; }
         .tt-box h2 { font-family:'Bevan',serif; font-weight:400; color:#FFB347; margin:0 0 12px; font-size:1.3rem; }
-        .tt-deck { position:relative; width:260px; height:260px; margin:0 auto; border-radius:14px; background:#0c0704;
-            border:3px solid #000; overflow:hidden; }
-        .tt-plato { position:absolute; inset:8px; border-radius:50%; background:#111; display:grid; place-items:center; }
-        .tt-disco { width:244px; height:244px; border-radius:50%; transform:translateY(-270px);
-            transition:transform .9s cubic-bezier(.3,1.3,.5,1); }
-        .tt.open .tt-disco { transform:translateY(0); }
+
+        /* Tornamesa */
+        .tt-tornamesa { position:relative; width:100%; max-width:400px; height:330px; margin:0 auto; }
+        .tt-cubierta { position:absolute; left:14px; right:14px; top:0; height:64px; border-radius:10px 10px 4px 4px;
+            background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(200,230,255,.08) 70%,rgba(255,255,255,.18));
+            border:2px solid rgba(255,255,255,.45); transform:perspective(400px) rotateX(-18deg); transform-origin:bottom;
+            box-shadow:0 2px 6px rgba(0,0,0,.4); }
+        .tt-cubierta::after { content:""; position:absolute; left:10%; right:10%; bottom:-6px; height:8px; background:#bbb; border-radius:4px; }
+
+        .tt-base { position:absolute; left:0; right:0; top:60px; bottom:0; border-radius:14px; border:3px solid #1a0c05;
+            background:repeating-linear-gradient(90deg,rgba(0,0,0,.09) 0 2px,transparent 2px 10px),
+                       linear-gradient(165deg,#A8703D,#6B3C1C 55%,#4A2510);
+            box-shadow:inset 0 2px 0 rgba(255,255,255,.22), 0 8px 0 var(--clr-ink); }
+        .tt-base::before, .tt-base::after { content:""; position:absolute; bottom:-14px; width:22px; height:12px; background:#111; border-radius:0 0 6px 6px; }
+        .tt-base::before { left:22px; }
+        .tt-base::after { right:22px; }
+
+        .tt-plato { position:absolute; left:36%; top:50%; width:236px; height:236px; transform:translate(-50%,-50%); border-radius:50%;
+            background:radial-gradient(circle,#2b2b2b 0 62%,#141414 63%);
+            border:6px solid #9d9d9d; box-shadow:0 4px 10px rgba(0,0,0,.6), inset 0 0 0 2px #333; }
+        .tt-plato::after { content:""; position:absolute; left:50%; top:50%; width:12px; height:12px; border-radius:50%;
+            transform:translate(-50%,-50%); background:radial-gradient(circle at 35% 35%,#fff,#888); z-index:3; }
+
+        .tt-disco { position:absolute; inset:2px; border-radius:50%; z-index:2; transform:translateY(-150px); opacity:0;
+            transition:transform .9s cubic-bezier(.3,1.3,.5,1), opacity .4s; }
+        .tt.open .tt-disco { transform:none; opacity:1; }
         .tt-surco { width:100%; height:100%; border-radius:50%; position:relative; animation:gira 2.4s linear infinite;
             animation-play-state:paused;
             background:
                 radial-gradient(circle,var(--a) 0 22%,#000 23% 25%,transparent 26%),
+                conic-gradient(from 20deg,rgba(255,255,255,.12),transparent 14%,transparent 50%,rgba(255,255,255,.1) 60%,transparent 72%),
                 repeating-radial-gradient(circle,#151515 0 2px,#252525 3px 4px); }
         .tt.playing .tt-surco { animation-play-state:running; }
         .tt-etiq { position:absolute; left:50%; top:50%; width:38%; height:38%; transform:translate(-50%,-50%); border-radius:50%;
             border:3px solid #000; background:linear-gradient(160deg,var(--a),var(--c)); background-size:cover; background-position:center; }
-        .tt-brazo { position:absolute; top:-14px; right:-18px; width:9px; height:150px; border-radius:6px;
-            background:linear-gradient(90deg,#999,#ddd); transform-origin:4px 4px; transform:rotate(-30deg);
-            transition:transform .8s ease; }
-        .tt.playing .tt-brazo { transform:rotate(-6deg); }
+
+        .tt-pivote { position:absolute; right:87px; top:50px; width:26px; height:26px; border-radius:50%; z-index:4;
+            background:radial-gradient(circle at 35% 35%,#fff,#9a9a9a 55%,#333); box-shadow:0 2px 4px rgba(0,0,0,.5); }
+        .tt-brazo { position:absolute; right:100px; top:59px; width:120px; height:8px; border-radius:4px; z-index:4;
+            background:linear-gradient(#f2f2f2,#8a8a8a); box-shadow:0 2px 3px rgba(0,0,0,.4);
+            transform-origin:100% 50%; transform:rotate(12deg); transition:transform .9s ease; }
+        .tt-brazo::after { content:""; position:absolute; left:-12px; top:-5px; width:22px; height:16px; background:#222;
+            border:1px solid #000; border-radius:3px; }
+        .tt.playing .tt-brazo { transform:rotate(-44deg); }
+
+        .tt-led { position:absolute; left:20px; bottom:18px; width:9px; height:9px; border-radius:50%; background:#ff4a2a; box-shadow:0 0 8px #ff4a2a; }
+        .tt-marca { position:absolute; right:18px; bottom:14px; font-family:'Bevan',serif; font-size:.8rem; color:#E8C9A0; letter-spacing:.06em; }
+
         #ttSpot iframe { display:block; width:100%; height:152px; border:0; border-radius:12px; margin-top:14px; }
         .tt .btn { font-family:inherit; font-weight:700; background:#FFB347; color:var(--clr-ink); border:3px solid var(--clr-ink);
             border-radius:4px; box-shadow:3px 3px 0 var(--clr-ink); padding:.45rem .9rem; margin:.4rem .2rem 0; cursor:pointer; }
@@ -235,18 +265,26 @@
     Gio's Wax Cellar · ERP Django 4.2 LTS · UTEC Celaya · Espiral 1 · Hecho por Gio
 </footer>
 
-<!-- NUEVO · Tocadiscos (disponible en todas las páginas) -->
+<!-- Tocadiscos (disponible en todas las páginas) -->
 <div class="tt" id="tt" role="dialog" aria-modal="true" aria-labelledby="ttTitulo">
     <div class="tt-box">
         <h2 id="ttTitulo"></h2>
-        <div class="tt-deck">
-            <div class="tt-plato">
-                <div class="tt-disco">
-                    <div class="tt-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
+
+        <div class="tt-tornamesa">
+            <div class="tt-cubierta"></div>
+            <div class="tt-base">
+                <div class="tt-plato">
+                    <div class="tt-disco">
+                        <div class="tt-surco" id="ttSurco"><div class="tt-etiq" id="ttEtiq"></div></div>
+                    </div>
                 </div>
+                <span class="tt-led"></span>
+                <span class="tt-marca">GIO'S · 33⅓</span>
             </div>
+            <div class="tt-pivote"></div>
             <div class="tt-brazo"></div>
         </div>
+
         <div id="ttSpot"></div>
         <div>
             <button type="button" class="btn" id="ttGirar">⏵ Girar</button>
