@@ -340,6 +340,28 @@
 })();
 </script>
 
+<!-- Parche temporal: iconos reales y nombre de marca en cualquier plantilla -->
+<script>
+(function () {
+    var NOMBRE = "Gio's Wax Cellar";
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    var nodos = [], n;
+    while ((n = walker.nextNode())) nodos.push(n);
+
+    nodos.forEach(function (t) {
+        var txt = t.nodeValue.trim();
+        var m = txt.match(/^fas fa-([a-z-]+)$/);
+        if (m) {
+            var i = document.createElement('i');
+            i.className = 'fas fa-' + m[1];
+            t.parentNode.replaceChild(i, t);
+        } else if (t.nodeValue.indexOf('UTEC Celaya') !== -1) {
+            t.nodeValue = t.nodeValue.replace(/UTEC Celaya/g, NOMBRE);
+        }
+    });
+})();
+</script>
+
 {% block extra_js %}{% endblock %}
 </body>
 </html>
