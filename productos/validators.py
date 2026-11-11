@@ -10,6 +10,7 @@ import filetype
 from PIL import Image, UnidentifiedImageError
 
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import UploadedFile
 
 
 # Tamaño máximo permitido: 5 MB
@@ -23,6 +24,11 @@ FORMATOS_PILLOW_PERMITIDOS = {'JPEG', 'PNG', 'WEBP'}
 def validar_imagen_producto(archivo) -> None:
     """Valida un archivo subido como imagen de producto.
 
+    Solo valida subidas nuevas (UploadedFile). Si el campo ya tiene una imagen
+    guardada, Django devuelve un FieldFile que apunta al almacenamiento; en
+    Render (disco efímero o Cloudinary) ese archivo puede no existir, y leerlo
+    provoca un FileNotFoundError (500). En ese caso no se vuelve a validar.
+
     Verificaciones realizadas (en orden):
         1. Tamaño máximo 5 MB.
         2. Tipo MIME real (magic bytes) es image/jpeg, image/png o image/webp.
@@ -34,6 +40,10 @@ def validar_imagen_producto(archivo) -> None:
     Raises:
         ValidationError: si alguna verificación falla.
     """
+    # Imagen ya guardada (no es una subida nueva): no revisar el almacenamiento.
+    if not isinstance(archivo, UploadedFile):
+        return
+
     # ── 1. Verificar tamaño ───────────────────────────────────────────────
     if archivo.size > MAX_IMAGE_SIZE:
         raise ValidationError(

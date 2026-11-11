@@ -38,9 +38,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 
+# ── Almacenamiento de media en Cloudinary (solo si USE_CLOUDINARY=True) ──
+USE_CLOUDINARY = (not TESTING) and env.bool('USE_CLOUDINARY', default=False)
+
 # ── Apps instaladas ───────────────────────────────────────────────────────
 # jazzmin debe ir ANTES de django.contrib.admin.
 # whitenoise.runserver_nostatic debe ir ANTES de django.contrib.staticfiles.
+# cloudinary_storage debe ir ANTES de django.contrib.staticfiles.
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -49,9 +53,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'whitenoise.runserver_nostatic',
+    *(['cloudinary_storage'] if USE_CLOUDINARY else []),
     'django.contrib.staticfiles',
     'django.contrib.sites',
     # Terceros
+    *(['cloudinary'] if USE_CLOUDINARY else []),
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -106,7 +112,6 @@ TEMPLATES = [
 # ── Base de datos ─────────────────────────────────────────────────────────
 # Local: si no hay DATABASE_URL, usa db.sqlite3 en la carpeta del proyecto.
 # Render: define DATABASE_URL con la Internal Database URL de tu PostgreSQL.
-# Sin esa variable en Render, los datos se pierden al redesplegar.
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}",
@@ -126,14 +131,19 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'           # destino de collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']         # fuentes adicionales
 
+# ── Archivos media (por defecto: disco local) ─────────────────────────────
+# En Render el disco es efímero: para que las fotos no se pierdan,
+# activa USE_CLOUDINARY=True (ver bloque Cloudinary más abajo).
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 STORAGES = {
     'default': {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
         # Tests: sin compresión, para no depender de collectstatic.
-        # Producción: WhiteNoise comprime los archivos, pero sin manifiesto
-        # con hash, así que no falla con 500 si falta una entrada.
+        # Producción: WhiteNoise comprime los archivos.
         'BACKEND': (
             'django.contrib.staticfiles.storage.StaticFilesStorage'
             if TESTING else
@@ -142,27 +152,29 @@ STORAGES = {
     },
 }
 
-# ── Archivos media ────────────────────────────────────────────────────────
-# WeasyPrint lee estos archivos desde disco mediante url_fetcher_local
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+if USE_CLOUDINARY:
+    CLOUDINARY_CLOUD_NAME = env('CLOUDINARY_CLOUD_NAME')
+    CLOUDINARY_API_KEY = env('CLOUDINARY_API_KEY')
+    CLOUDINARY_API_SECRET = env('CLOUDINARY_API_SECRET')
 
-# ── Almacenamiento de fotos en S3 (solo si USE_S3=True) ───────────────────
-# Así las fotos subidas no se pierden en cada redeploy de Render.
-# Local: no se activa. Render: agrega USE_S3=True y las variables AWS_*.
-if not TESTING and env.bool('USE_S3', default=False):
-    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    AWS_DEFAULT_ACL = None   # el bucket decide el acceso (política pública de lectura)
-    AWS_QUERYSTRING_AUTH = False  # URLs públicas sin firma temporal
+    import cloudinary
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True,
+    )
+
+    # Configuración que lee django-cloudinary-storage
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+        'API_KEY': CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
+    }
 
     STORAGES['default'] = {
-        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
     }
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 # ── Autenticación ─────────────────────────────────────────────────────────
 LOGIN_URL = '/accounts/login/'
