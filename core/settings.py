@@ -142,13 +142,9 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        # Tests: sin compresión, para no depender de collectstatic.
-        # Producción: WhiteNoise comprime los archivos.
-        'BACKEND': (
-            'django.contrib.staticfiles.storage.StaticFilesStorage'
-            if TESTING else
-            'whitenoise.storage.CompressedStaticFilesStorage'
-        ),
+        # Sin compresión: WhiteNoise sirve los estáticos igual, y evita el
+        # FileNotFoundError de collectstatic con los archivos de admin/Jazzmin.
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
     },
 }
 
