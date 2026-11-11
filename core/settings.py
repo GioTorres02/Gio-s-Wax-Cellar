@@ -23,10 +23,14 @@ RENDER_EXTERNAL_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME', default='')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# Cualquier subdominio de Render (gios-wax-cellar.onrender.com, etc.)
+ALLOWED_HOSTS.append('.onrender.com')
+
 # Orígenes de confianza para POST (CSRF). Django exige el esquema https://
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'https://*.onrender.com',
 ]
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
@@ -130,6 +134,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'           # destino de collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']         # fuentes adicionales
+
+# WhiteNoise sirve los estáticos directo desde las carpetas del proyecto
+# (admin, Jazzmin, static/img, etc.) aunque collectstatic no los haya copiado.
+WHITENOISE_USE_FINDERS = True
 
 # ── Archivos media (por defecto: disco local) ─────────────────────────────
 # En Render el disco es efímero: para que las fotos no se pierdan,
