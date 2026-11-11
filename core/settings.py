@@ -1,7 +1,8 @@
 # core/settings.py
 import sys
-import environ
 from pathlib import Path
+
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,8 +38,8 @@ CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 
 # ── Apps instaladas ───────────────────────────────────────────────────────
-# jazzmin debe ir ANTES de django.contrib.admin
-# core/settings.py — actualizar INSTALLED_APPS:
+# jazzmin debe ir ANTES de django.contrib.admin.
+# whitenoise.runserver_nostatic debe ir ANTES de django.contrib.staticfiles.
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django.contrib.sites',
     # Terceros
@@ -54,8 +56,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_framework',
     'rest_framework.authtoken',
-    'django_filters',              # ← nuevo (nombre de app es django_filters)
-    'whitenoise.runserver_nostatic',
+    'django_filters',
     # Apps del ERP
     'clientes',
     'proveedores',
@@ -63,7 +64,7 @@ INSTALLED_APPS = [
     'ventas',
     'reportes',
     'configuracion',
-    'catalogo',                    # ← nuevo
+    'catalogo',
     'core',
 ]
 
@@ -82,8 +83,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'core.urls'
 
 # ── Templates ─────────────────────────────────────────────────────────────
-# Django busca primero en C:\Temp_Workspace_ERP\templates\ (base.html, home.html)
-# core/settings.py — actualizar TEMPLATES[0]['OPTIONS']['context_processors']:
+# Django busca primero en BASE_DIR/templates/ (base.html, home.html, partials/)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -95,7 +95,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # Context processor del carrito — W13
+                # Contador del carrito (carrito_total_items) — W13
                 'catalogo.context_processors.carrito_info',
             ],
         },
@@ -117,7 +117,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ── Archivos estáticos ────────────────────────────────────────────────────
-# La música de los vinilos va en  static/musica/  (sabrina.mp3, olivia.mp3, ...)
+# La música de los vinilos va en static/musica/ (sabrina.mp3, olivia.mp3, ...)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'           # destino de collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']         # fuentes adicionales
@@ -144,7 +144,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # ── Autenticación ─────────────────────────────────────────────────────────
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/productos/'
+LOGIN_REDIRECT_URL = '/catalogo/'      # tras iniciar sesión, la tienda
 LOGOUT_REDIRECT_URL = '/'
 
 # ── DRF ──────────────────────────────────────────────────────────────────
@@ -171,7 +171,7 @@ JAZZMIN_SETTINGS = {
     'welcome_sign': "Bienvenido al sótano del vinilo",
     'copyright': "Gio Torres · Gio's Wax Cellar · UTEC Celaya",
 
-    # Logo (ruta relativa a static/, agregar en W11+)
+    # Logo (ruta relativa a static/)
     'site_icon': None,
     'site_logo': None,
 
@@ -180,7 +180,7 @@ JAZZMIN_SETTINGS = {
 
     # Menú superior
     'topmenu_links': [
-        {'name': 'La tienda', 'url': '/', 'new_window': False},
+        {'name': 'La tienda', 'url': '/catalogo/', 'new_window': False},
         {'name': 'Productos', 'url': '/productos/'},
         {'name': 'Clientes', 'url': '/clientes/'},
         {'name': 'Ventas', 'url': '/ventas/'},
@@ -188,7 +188,7 @@ JAZZMIN_SETTINGS = {
 
     # Menú de usuario
     'usermenu_links': [
-        {'name': 'Ver la tienda', 'url': '/', 'new_window': False},
+        {'name': 'Ver la tienda', 'url': '/catalogo/', 'new_window': False},
     ],
 
     # Orden del menú lateral
@@ -276,9 +276,8 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_SESSION_REMEMBER = True
 
-# core/settings.py — agregar al final (antes de JAZZMIN_SETTINGS):
-
-# ── STRIPE (Pasarela de pago) ──────────────────────────────────────────────
-STRIPE_SECRET_KEY     = env('STRIPE_SECRET_KEY',     default='sk_test_placeholder')
+# ── STRIPE (pasarela de pago) ─────────────────────────────────────────────
+# Las claves reales van SOLO en .env (nunca en este archivo ni en Git).
+STRIPE_SECRET_KEY      = env('STRIPE_SECRET_KEY',      default='sk_test_placeholder')
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='pk_test_placeholder')
-STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default='whsec_placeholder')
+STRIPE_WEBHOOK_SECRET  = env('STRIPE_WEBHOOK_SECRET',  default='whsec_placeholder')
