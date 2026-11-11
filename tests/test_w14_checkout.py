@@ -1,4 +1,4 @@
-"""Suite de pruebas W14 — Checkout y proceso de pago con Stripe.
+"""Suite de pruebas W14: checkout y proceso de pago con Stripe.
 
 Usa unittest.mock.patch para simular stripe.PaymentIntent.create
 sin requerir claves reales ni conexión a internet.
@@ -7,7 +7,7 @@ Ejecutar con:
     python manage.py test tests.test_w14_checkout --verbosity=2
 
 Resultado esperado:
-    Ran 8 tests in X.XXXs
+    Ran 11 tests in X.XXXs
     OK
 """
 from decimal import Decimal
@@ -17,10 +17,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from clientes.models        import Cliente
-from configuracion.models   import ConfiguracionERP
-from productos.models       import Categoria, Producto
-from ventas.models          import Pedido
+from catalogo.checkout_utils import obtener_o_crear_cliente
+from clientes.models import Cliente
+from configuracion.models import ConfiguracionERP
+from productos.models import Categoria, Producto
+from ventas.models import Pedido
 
 
 def _setup_carrito(client, producto):
@@ -131,24 +132,37 @@ class CheckoutPagoTest(TestCase):
 
 
 class PagoExitosoTest(TestCase):
-    """Tests de la vista pago_exitoso."""
+    """Tests de la vista pago_exitoso (requiere login y pedido propio)."""
 
     def setUp(self):
         ConfiguracionERP.get_instance()
-        cat  = Categoria.objects.create(nombre='C')
-        prod = Producto.objects.create(
-            nombre='P', precio=Decimal('100.00'), stock=5, categoria=cat
+
+        self.user = User.objects.create_user(
+            'comprador', password='clave-segura-123',
+            email='comprador@test.com',
         )
-        cli  = Cliente.objects.create(nombre='C', correo='c@t.com')
+        self.client.force_login(self.user)
+
+        # Usar el mismo flujo que el checkout real para que el Cliente
+        # quede vinculado al usuario
+        cliente = obtener_o_crear_cliente(self.user)
         self.pedido = Pedido.objects.create(
-            numero_pedido='PED-2025-0001',
-            cliente=cli,
-            estado='pendiente',
-            total_pagado=Decimal('116.00')
+            numero_pedido  = 'PED-2025-0001',
+            cliente        = cliente,
+            estado         = 'pendiente',
+            total_pagado   = Decimal('116.00'),
+            items_snapshot = [],
         )
 
+    def _poner_carrito_en_sesion(self):
+        session = self.client.session
+        session['carrito'] = {
+            '1': {'nombre': 'P', 'precio': '100.00', 'cantidad': 1}
+        }
+        session.save()
+
     def test_pago_exitoso_devuelve_200(self):
-        """GET /catalogo/pago-exitoso/<id>/ → 200."""
+        """GET /catalogo/pago-exitoso/<id>/ → 200 para el dueño del pedido."""
         r = self.client.get(
             reverse('catalogo:pago_exitoso', args=[self.pedido.pk])
         )
@@ -156,15 +170,20 @@ class PagoExitosoTest(TestCase):
 
     def test_pago_exitoso_vacia_carrito(self):
         """Visitar pago_exitoso vacía la sesión del carrito."""
-        session = self.client.session
-        session['carrito'] = {'1': {'nombre': 'P', 'precio': '100',
-                                     'cantidad': 1}}
-        session.save()
-
+        self._poner_carrito_en_sesion()
         self.client.get(
             reverse('catalogo:pago_exitoso', args=[self.pedido.pk])
         )
-        # El carrito en la sesión debe quedar vacío
-        self.assertEqual(
-            self.client.session.get('carrito', {}), {}
+        self.assertEqual(self.client.session.get('carrito', {}), {})
+
+    def test_pago_exitoso_pedido_ajeno_da_404(self):
+        """Un usuario no puede ver el pedido de otro."""
+        otro = User.objects.create_user(
+            'intruso', password='clave-segura-123',
+            email='intruso@test.com',
         )
+        self.client.force_login(otro)
+        r = self.client.get(
+            reverse('catalogo:pago_exitoso', args=[self.pedido.pk])
+        )
+        self.assertEqual(r.status_code, 404)
