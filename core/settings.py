@@ -131,12 +131,13 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        # Tests: no exigen el manifiesto (así no fallan por archivos sin collectstatic).
-        # Producción: WhiteNoise con manifiesto; ejecutar `collectstatic` antes de arrancar.
+        # Tests: sin compresión, para no depender de collectstatic.
+        # Producción: WhiteNoise comprime los archivos, pero sin manifiesto
+        # con hash, así que no falla con 500 si falta una entrada.
         'BACKEND': (
             'django.contrib.staticfiles.storage.StaticFilesStorage'
             if TESTING else
-            'whitenoise.storage.CompressedManifestStaticFilesStorage'
+            'whitenoise.storage.CompressedStaticFilesStorage'
         ),
     },
 }
@@ -285,3 +286,16 @@ ACCOUNT_SESSION_REMEMBER = True
 STRIPE_SECRET_KEY      = env('STRIPE_SECRET_KEY',      default='sk_test_placeholder')
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='pk_test_placeholder')
 STRIPE_WEBHOOK_SECRET  = env('STRIPE_WEBHOOK_SECRET',  default='whsec_placeholder')
+
+# ── LOGGING: muestra los errores 500 en Render → Logs ─────────────────────
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'root': {'handlers': ['console'], 'level': 'WARNING'},
+    'loggers': {
+        'django.request': {'handlers': ['console'], 'level': 'ERROR', 'propagate': False},
+    },
+}
