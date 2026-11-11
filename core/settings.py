@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 
+import dj_database_url
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -103,11 +104,14 @@ TEMPLATES = [
 ]
 
 # ── Base de datos ─────────────────────────────────────────────────────────
+# Local: si no hay DATABASE_URL, usa db.sqlite3 en la carpeta del proyecto.
+# Render: define DATABASE_URL con la Internal Database URL de tu PostgreSQL.
+# Sin esa variable en Render, los datos se pierden al redesplegar.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}",
+        conn_max_age=600,
+    )
 }
 
 # ── Internacionalización ──────────────────────────────────────────────────
