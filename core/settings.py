@@ -147,6 +147,23 @@ STORAGES = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ── Almacenamiento de fotos en S3 (solo si USE_S3=True) ───────────────────
+# Así las fotos subidas no se pierden en cada redeploy de Render.
+# Local: no se activa. Render: agrega USE_S3=True y las variables AWS_*.
+if not TESTING and env.bool('USE_S3', default=False):
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_DEFAULT_ACL = None   # el bucket decide el acceso (política pública de lectura)
+    AWS_QUERYSTRING_AUTH = False  # URLs públicas sin firma temporal
+
+    STORAGES['default'] = {
+        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+    }
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
 # ── Autenticación ─────────────────────────────────────────────────────────
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/catalogo/'      # tras iniciar sesión, la tienda
